@@ -1,0 +1,4 @@
+node_modules
+.vscode
+cloudformation
+__generated__

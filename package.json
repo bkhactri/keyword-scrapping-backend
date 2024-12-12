@@ -1,0 +1,90 @@
+{
+  "name": "technical-challenge-be",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "precommit": "npm-run-all --max-parallel 3 -p lint:check format:check",
+    "format:check": "prettier --check \"src/**/*.ts\"",
+    "format:fix": "prettier --write \"src/**/*.ts\"",
+    "lint:check": "eslint \"{src,test}/**/*.ts\" --max-warnings=0 && echo ✔ Your code looks good",
+    "lint:fix": "eslint \"{src,test}/**/*.ts\" --max-warnings=0 --fix",
+    "start:local": "nodemon -r tsconfig-paths/register ./src/index.ts",
+    "start:prod": "node --no-warnings dist/src/index.js",
+    "test": "jest --runInBand --testTimeout=1000",
+    "test:cov": "jest --runInBand --testTimeout=1000 --coverage",
+    "build": "rm -rf dist && tsc --build tsconfig.build.json && tsc-alias"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "devDependencies": {
+    "@tsconfig/node20": "^20.1.2",
+    "@types/body-parser": "^1.19.5",
+    "@types/bunyan": "^1.8.11",
+    "@types/compression": "^1.7.5",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.11",
+    "@types/node": "^20.11.10",
+    "@types/supertest": "^6.0.2",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0",
+    "commitizen": "^4.3.0",
+    "cz-conventional-changelog": "^3.3.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "husky": "^8.0.3",
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.3",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^3.2.2",
+    "supertest": "^6.3.4",
+    "ts-jest": "^29.1.1",
+    "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.8",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "bunyan": "^1.8.15",
+    "compression": "^1.7.5",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "helmet": "^8.0.0",
+    "http-graceful-shutdown": "^3.1.13",
+    "zod": "^3.22.4"
+  },
+  "jest": {
+    "verbose": true,
+    "preset": "ts-jest",
+    "testRegex": ".*\\.(spec|test)\\.ts$",
+    "transform": {
+      ".+\\.(t|j)s$": "ts-jest"
+    },
+    "coverageDirectory": "coverage",
+    "testEnvironment": "node",
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts",
+      "node"
+    ],
+    "setupFiles": [
+      "<rootDir>/tests/jest-setup.ts"
+    ],
+    "moduleDirectories": [
+      "node_modules"
+    ],
+    "moduleNameMapper": {
+      "@/(.*)": "<rootDir>/$1",
+      "@src/(.*)": "<rootDir>/src/$1",
+      "@tests/(.*)": "<rootDir>/tests/$1"
+    }
+  }
+}
