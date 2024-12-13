@@ -1,8 +1,6 @@
 name: PR-CI
 
 on:
-  push:
-    branches: ['main']
   pull_request:
     branches: ['main']
 
@@ -35,3 +33,6 @@ jobs:
 
       - name: Verify tests
         run: npm run test:cov
+
+      - name: Build status
+        run: npm run build

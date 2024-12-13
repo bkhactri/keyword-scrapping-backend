@@ -1,6 +1,6 @@
 import express from 'express';
 import request from 'supertest';
-import createServer from '@src/server'; // Adjust the path as needed
+import createServer from '@src/server';
 
 describe('createServer', () => {
   let app: express.Application;
@@ -8,6 +8,10 @@ describe('createServer', () => {
   beforeAll(async () => {
     const server = await createServer();
     app = server.app;
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   it('should configure CORS middleware', async () => {
