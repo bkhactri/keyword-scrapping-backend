@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import UserModel from '@src/models/user.model';
+import { User } from '@src/models';
 import sequelize from '@src/config/database';
 import {
   UserAttributes,
@@ -9,8 +9,6 @@ import {
 } from '@src/interfaces/user.interface';
 import { BadRequestError, UnauthorizedError } from '@src/utils/error.util';
 import { UserDto } from '@src/dtos/user.dto';
-
-const User = UserModel(sequelize);
 
 const generateToken = (user: UserAttributes): string => {
   return jwt.sign(
