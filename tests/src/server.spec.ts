@@ -44,7 +44,7 @@ describe('createServer', () => {
   });
 
   it('should use health router', async () => {
-    const response = await request(app).get('/health');
+    const response = await request(app).get('/api/v1/health');
 
     expect(response.status).toBe(200);
     expect(response.text).toBe(`${process.env.SERVICE_NAME} is ok`);

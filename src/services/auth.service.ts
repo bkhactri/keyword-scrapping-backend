@@ -1,14 +1,14 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import UserModel from '../models/user.model';
-import sequelize from '../config/database';
+import UserModel from '@src/models/user.model';
+import sequelize from '@src/config/database';
 import {
   UserAttributes,
   UserSignUpPayload,
   UserSignInPayload,
-} from '../interfaces/user.interface';
-import { BadRequestError, UnauthorizedError } from '../utils/error.util';
-import { UserDto } from '../dtos/user.dto';
+} from '@src/interfaces/user.interface';
+import { BadRequestError, UnauthorizedError } from '@src/utils/error.util';
+import { UserDto } from '@src/dtos/user.dto';
 
 const User = UserModel(sequelize);
 
@@ -29,7 +29,7 @@ export const signup = async (userData: UserSignUpPayload): Promise<UserDto> => {
   const existingUser = await User.findOne({ where: { email: userData.email } });
   if (existingUser) {
     throw new BadRequestError(
-      'Email address is already in use. Please use a different email.',
+      'Email address is already in use. Please use a different email',
     );
   }
 

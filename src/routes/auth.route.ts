@@ -1,6 +1,6 @@
 // routes/auth.route.ts
 import express from 'express';
-import * as authController from '../controllers/auth.controller';
+import * as authController from '@src/controllers/auth.controller';
 import { check } from 'express-validator';
 
 const router = express.Router();

@@ -97,7 +97,7 @@ describe('Auth service', () => {
         fn: () => authService.signup(userSignUpPayload),
         exceptionInstance: AppError,
         message:
-          'Email address is already in use. Please use a different email.',
+          'Email address is already in use. Please use a different email',
       });
     });
   });

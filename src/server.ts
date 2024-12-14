@@ -5,8 +5,10 @@ import compression from 'compression';
 import helmet from 'helmet';
 import { healthRouter } from './routes/health.route';
 import { authRouter } from './routes/auth.route';
+import { fileUploadRouter } from './routes/file.route';
 import errorHandler from './middlewares/error-handler.middleware';
 import requestLogger from './middlewares/request-logger.middleware';
+import authMiddleware from './middlewares/auth.middleware';
 
 const createServer = async (): Promise<{ app: express.Express }> => {
   const app = express();
@@ -22,9 +24,10 @@ const createServer = async (): Promise<{ app: express.Express }> => {
   // Logger
   app.use(requestLogger);
 
-  // Router configuration
-  app.use(healthRouter);
-  app.use(authRouter);
+  // Router v1 configuration
+  app.use('/api/v1', healthRouter);
+  app.use('/api/v1', authRouter);
+  app.use('/api/v1', authMiddleware, fileUploadRouter);
 
   // Error handler middleware
   app.use(errorHandler);

@@ -35,7 +35,7 @@ const main = async () => {
     // Handle graceful shutdown
     const gracefulShutdown = async () => {
       server.close(() => {
-        logger.info('Server shutdown gracefully.');
+        logger.info('Server shutdown gracefully');
       });
     };
 

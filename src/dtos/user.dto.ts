@@ -1,4 +1,4 @@
-import { UserAttributes } from '../interfaces/user.interface';
+import { UserAttributes } from '@src/interfaces/user.interface';
 
 export class UserDto {
   id: number;
