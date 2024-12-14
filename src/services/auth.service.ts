@@ -1,7 +1,6 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { User } from '@src/models';
-import sequelize from '@src/config/database';
 import {
   UserAttributes,
   UserSignUpPayload,
