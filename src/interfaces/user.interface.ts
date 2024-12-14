@@ -1,14 +1,25 @@
 export interface UserAttributes {
   id: number;
   email: string;
-  password_hash: string;
-  created_at: Date;
+  firstName: string;
+  lastName: string;
+  passwordHash: string;
+  createdAt: Date;
+}
+
+export interface UserSignUpAttributes {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+}
+
+export interface UserSignInAttributes {
+  email: string;
+  password: string;
 }
 
 export interface UserCreationAttributes
-  extends Omit<UserAttributes, 'id' | 'created_at'> {}
-
-export interface UserAuthenticateAttributes {
-  email: string;
-  password: string;
+  extends Omit<UserSignUpAttributes, 'password'> {
+  passwordHash: string;
 }

@@ -33,7 +33,7 @@ describe('Auth controller', () => {
     it('should create a new user and return 201 if successful', async () => {
       const validatedData = {
         email: 'test@example.com',
-        password_hash: 'password',
+        passwordHash: 'password',
       };
 
       (validationResult as unknown as jest.Mock).mockReturnValue({
@@ -92,7 +92,7 @@ describe('Auth controller', () => {
     it('should return a token and 200 if successful', async () => {
       const validatedData = {
         email: 'test@example.com',
-        password_hash: 'password',
+        passwordHash: 'password',
       };
       const token = 'test-token';
 
