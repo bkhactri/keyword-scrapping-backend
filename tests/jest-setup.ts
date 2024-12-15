@@ -1,3 +1,5 @@
+jest.mock('@src/config/logger');
+
 process.env = {
   HOST: 'localhost',
   PORT: '3000',
@@ -8,4 +10,6 @@ process.env = {
   POSTGRES_PASSWORD: 'admin',
   JWT_SECRET: 'mock-secret',
   JWT_EXPIRED_TIME: '1h',
+  REDIS_HOST: 'locahost',
+  REDIS_PORT: '6379',
 };

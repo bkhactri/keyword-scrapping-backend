@@ -5,8 +5,15 @@ export interface KeywordAttributes {
   userId: string;
   keyword: string;
   status: KeywordStatus;
-  createdAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface KeywordCreationPayload
-  extends Omit<KeywordAttributes, 'id' | 'createdAt'> {}
+  extends Omit<KeywordAttributes, 'id' | 'createdAt' | 'updatedAt'> {}
+
+export interface KeywordProcessingPayload {
+  userId: string;
+  keyword: string;
+  keywordId: number;
+}

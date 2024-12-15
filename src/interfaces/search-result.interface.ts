@@ -4,8 +4,9 @@ export interface SearchResultAttributes {
   totalAds: number;
   totalLinks: number;
   htmlCacheId?: number | null;
-  createdAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface SearchResultCreationPayload
-  extends Omit<SearchResultAttributes, 'id' | 'createdAt'> {}
+  extends Omit<SearchResultAttributes, 'id' | 'createdAt' | 'updatedAt'> {}

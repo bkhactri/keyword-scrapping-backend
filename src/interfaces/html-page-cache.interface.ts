@@ -1,8 +1,9 @@
 export interface HtmlPageCacheAttributes {
   id: number;
   html: string;
-  createdAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface HtmlPageCacheCreationPayload
-  extends Omit<HtmlPageCacheAttributes, 'id' | 'createdAt'> {}
+  extends Omit<HtmlPageCacheAttributes, 'id' | 'createdAt' | 'updatedAt'> {}

@@ -2,6 +2,9 @@ import express from 'express';
 import request from 'supertest';
 import createServer from '@src/server';
 
+jest.mock('bullmq');
+jest.mock('ioredis');
+
 describe('createServer', () => {
   let app: express.Application;
 

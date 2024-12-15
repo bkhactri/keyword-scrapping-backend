@@ -1,11 +1,19 @@
 export interface UserAttributes {
-  id: number;
+  id: string;
   email: string;
   firstName: string;
   lastName: string;
   passwordHash: string;
-  createdAt: Date;
   accessToken?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface UserTokenPayload {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
 }
 
 export interface UserSignUpPayload {

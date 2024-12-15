@@ -20,7 +20,7 @@ const errorHandler = (
       details: err.details,
     });
   } else {
-    logger.error('Unexpected Error:', err);
+    logger.error({ err }, 'Unexpected Error');
 
     return res.status(500).json({
       message: err.message || 'Something went wrong!',

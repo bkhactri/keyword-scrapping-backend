@@ -1,11 +1,12 @@
 import { UserAttributes } from '@src/interfaces/user.interface';
 
 export class UserDto {
-  id: number;
+  id: string;
   email: string;
   firstName: string;
   lastName: string;
-  createdAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
   accessToken?: string;
 
   constructor(user: UserAttributes) {

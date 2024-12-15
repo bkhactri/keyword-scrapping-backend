@@ -13,7 +13,8 @@ class Keyword
   public userId!: string;
   public keyword!: string;
   public status!: KeywordStatus;
-  public createdAt!: Date;
+  public createdAt?: Date;
+  public updatedAt?: Date;
 }
 
 const KeywordModel = (sequelize: Sequelize) => {
@@ -25,7 +26,7 @@ const KeywordModel = (sequelize: Sequelize) => {
         primaryKey: true,
       },
       userId: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.UUID,
         allowNull: false,
         references: {
           model: 'users',
@@ -41,16 +42,11 @@ const KeywordModel = (sequelize: Sequelize) => {
         allowNull: false,
         defaultValue: 'pending',
       },
-      createdAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW,
-      },
     },
     {
       sequelize,
       tableName: 'keywords',
-      timestamps: false,
+      timestamps: true,
     },
   );
 

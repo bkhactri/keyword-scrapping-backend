@@ -34,7 +34,7 @@ describe('Auth service', () => {
   const mockSign = jwt.sign as jest.Mock;
 
   const mockUser: UserAttributes = {
-    id: 1,
+    id: 'mock-user-id',
     email: 'test@example.com',
     passwordHash: 'hashedPassword',
     firstName: 'mock first name',
@@ -79,7 +79,7 @@ describe('Auth service', () => {
         passwordHash: 'hashedPassword',
       });
       expect(newUser).toMatchObject({
-        id: 1,
+        id: 'mock-user-id',
         email: 'test@example.com',
         firstName: 'mock first name',
         lastName: 'mock last name',
@@ -125,7 +125,7 @@ describe('Auth service', () => {
         accessToken: 'mock-token',
         email: 'test@example.com',
         firstName: 'mock first name',
-        id: 1,
+        id: 'mock-user-id',
         lastName: 'mock last name',
       });
     });
