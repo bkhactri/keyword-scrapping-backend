@@ -4,7 +4,7 @@ import {
   nextFuncMock,
 } from '@tests/_mocks_/server-mock';
 import * as fileController from '@src/controllers/file.controller';
-import { AppError } from '@/src/utils/error.util';
+import { AppError } from '@src/utils/error.util';
 import * as fileService from '@src/services/file.service';
 import * as keywordService from '@src/services/keyword.service';
 

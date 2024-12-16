@@ -2,7 +2,7 @@ import KeywordModel from '@src/models/keyword.model';
 import sequelize from '@src/config/database';
 import * as keywordService from '@src/services/keyword.service';
 import { expectException } from '@tests/helpers/expect-exception.helper';
-import { KeywordStatus } from '@/src/enums/keyword.enum';
+import { KeywordStatus } from '@src/enums/keyword.enum';
 
 jest.mock('@src/models/keyword.model', () => {
   const mockKeywordModel = {

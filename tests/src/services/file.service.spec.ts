@@ -1,6 +1,6 @@
 import { AppError } from '@src/utils/error.util';
 import { parseCSV, validateKeywords } from '@src/services/file.service';
-import { expectException } from '@/tests/helpers/expect-exception.helper';
+import { expectException } from '@tests/helpers/expect-exception.helper';
 
 describe('File service', () => {
   describe('parseCSV', () => {
