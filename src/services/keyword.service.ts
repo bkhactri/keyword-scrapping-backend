@@ -1,6 +1,12 @@
+import { Op, WhereOptions } from 'sequelize';
 import { Keyword } from '@src/models';
 import { KeywordStatus } from '@src/enums/keyword.enum';
 import { KeywordDto } from '@src/dtos/keyword.dto';
+import {
+  KeywordAttributes,
+  KeywordList,
+} from '@src/interfaces/keyword.interface';
+import { Filter, Pagination } from '@src/interfaces/common.interface';
 
 export const createBulk = async (
   userId: string,
@@ -38,4 +44,40 @@ export const getByKeywordId = async (id: number): Promise<KeywordDto> => {
   }
 
   return new KeywordDto(keyword.dataValues);
+};
+
+export const getKeywords = async (
+  userId: string,
+  pagination: Pagination,
+  filter: Filter,
+): Promise<KeywordList> => {
+  const { page, pageSize } = pagination;
+  const offset = page * pageSize;
+  const limit = pageSize;
+
+  const whereClause: WhereOptions<KeywordAttributes> = {
+    userId,
+  };
+
+  if (filter?.search) {
+    whereClause.keyword = { [Op.iLike]: `%${filter?.search}%` };
+  }
+
+  try {
+    const { count, rows } = await Keyword.findAndCountAll({
+      where: whereClause,
+      offset,
+      limit,
+      order: [['updatedAt', 'DESC']],
+    });
+
+    return {
+      total: count,
+      keywords: rows.map((keyword) => new KeywordDto(keyword.dataValues)),
+      page,
+      pageSize,
+    };
+  } catch (error) {
+    throw error;
+  }
 };
