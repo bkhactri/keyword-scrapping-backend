@@ -5,6 +5,7 @@ import sequelize from './config/database';
 import { logger } from './config/logger';
 import { keywordWorker } from './workers/keyword.worker';
 import { keywordQueue, redisConnection } from './config/queue';
+import { setupSocket } from './config/socket';
 
 const handleUncaughtExceptions = (error: Error) => {
   logger.error({ error }, 'An uncaught exception occurred');
@@ -47,6 +48,8 @@ const main = async () => {
     const server = app.listen(port, () => {
       logger.info({ port }, 'Server listening on port');
     });
+
+    setupSocket(server);
 
     process.on('uncaughtException', handleUncaughtExceptions);
     process.on('unhandledRejection', handleUnhandledRejections);

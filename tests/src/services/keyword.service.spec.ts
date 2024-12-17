@@ -111,4 +111,30 @@ describe('Keyword service', () => {
       );
     });
   });
+
+  describe('getKeywordById', () => {
+    it('should return correct keyword', async () => {
+      mockFindByPk.mockResolvedValue({
+        dataValues: {
+          id: mockKeywordId,
+        },
+      });
+
+      const result = await keywordService.getByKeywordId(mockKeywordId);
+
+      expect(mockFindByPk).toHaveBeenCalled();
+      expect(mockFindByPk).toHaveBeenCalledWith(mockKeywordId);
+      expect(result).toMatchObject({ id: mockKeywordId });
+    });
+
+    it('should throw error if get return empty result', async () => {
+      mockFindByPk.mockResolvedValue(null);
+
+      await expectException({
+        fn: () => keywordService.getByKeywordId(mockKeywordId),
+        exceptionInstance: Error,
+        message: 'Keyword not found',
+      });
+    });
+  });
 });

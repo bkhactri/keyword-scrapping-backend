@@ -13,6 +13,7 @@ describe('Scrape service', () => {
     let mockEvaluate: jest.Mock;
     let mockContent: jest.Mock;
     let mockClose: jest.Mock;
+    let mockSetViewport: jest.Mock;
 
     beforeEach(() => {
       mockNewPage = jest.fn();
@@ -23,10 +24,12 @@ describe('Scrape service', () => {
       mockEvaluate = jest.fn();
       mockContent = jest.fn();
       mockClose = jest.fn();
+      mockSetViewport = jest.fn();
 
       (puppeteer.launch as jest.Mock).mockResolvedValue({
         newPage: mockNewPage.mockResolvedValue({
           setUserAgent: mockSetUserAgent,
+          setViewport: mockSetViewport,
           on: mockOn,
           goto: mockGoto,
           waitForSelector: mockWaitForSelector,

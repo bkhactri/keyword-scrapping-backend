@@ -6,6 +6,13 @@ const sequelize = new Sequelize({
   password: process.env.POSTGRES_PASSWORD,
   dialect: 'postgres',
   logging: false,
+  pool: {
+    max: 15,
+    min: 5,
+    idle: 20000,
+    evict: 15000,
+    acquire: 30000,
+  },
 });
 
 export default sequelize;

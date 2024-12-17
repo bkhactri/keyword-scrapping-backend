@@ -23,6 +23,11 @@ export const scrapeGoogle = async (
       await browser.close();
     });
 
+    await page.setViewport({ width: 1280, height: 800 });
+    await new Promise((resolve) =>
+      setTimeout(resolve, Math.random() * 2000 + 1000),
+    );
+
     const url = `https://www.google.com/search?q=${search}&start=${pageIndex * 10}`;
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 15000 });
     await page.waitForSelector('.LC20lb', { timeout: 15000 });
@@ -54,9 +59,5 @@ export const scrapeGoogle = async (
     await browser.close();
 
     return null;
-  } finally {
-    await new Promise((resolve) =>
-      setTimeout(resolve, Math.random() * 500 + 1000),
-    );
   }
 };

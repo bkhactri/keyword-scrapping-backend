@@ -31,9 +31,19 @@ services:
     volumes:
       - pgadmin-data:/var/lib/pgadmin
 
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379
+    networks:
+      - webnet
+    volumes:
+      - redis-data:/data
+
 volumes:
   postgres-data:
   pgadmin-data:
+  redis-data:
 
 networks:
   webnet:

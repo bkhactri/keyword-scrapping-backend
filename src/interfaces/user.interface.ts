@@ -32,3 +32,12 @@ export interface UserCreationPayload
   extends Omit<UserSignUpPayload, 'password'> {
   passwordHash: string;
 }
+
+export interface UserConnectionAttributes {
+  id: number;
+  userId: string;
+  socketId: string;
+}
+
+export interface UserConnectionCreationPayload
+  extends Omit<UserConnectionAttributes, 'id'> {}
