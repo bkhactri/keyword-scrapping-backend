@@ -8,6 +8,7 @@ process.env = {
   POSTGRES_DATABASE: 'mock-db',
   POSTGRES_USERNAME: 'admin',
   POSTGRES_PASSWORD: 'admin',
+  POSTGRES_HOST: 'postgres',
   JWT_SECRET: 'mock-secret',
   JWT_EXPIRED_TIME: '1h',
   REDIS_HOST: 'locahost',
