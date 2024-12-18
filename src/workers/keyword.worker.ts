@@ -57,7 +57,7 @@ export const processKeyword = async (
 
 export const keywordWorker = new Worker(QUEUE_NAME, processKeyword, {
   connection: redisConnection,
-  concurrency: 10,
+  concurrency: 20,
   removeOnComplete: { count: 1000 },
   removeOnFail: { count: 500 },
   limiter: {

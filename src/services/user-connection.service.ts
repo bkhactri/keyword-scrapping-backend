@@ -28,7 +28,9 @@ export const createConnection = async (
   return createdConnection.dataValues;
 };
 
-export const deleteConnection = async (socketId: string): Promise<boolean> => {
+export const deleteConnectionBySocketId = async (
+  socketId: string,
+): Promise<boolean> => {
   const deletedConnection = await UserConnection.destroy({
     where: {
       socketId,
@@ -36,8 +38,20 @@ export const deleteConnection = async (socketId: string): Promise<boolean> => {
   });
 
   if (!deletedConnection) {
-    throw new Error('Delete user connection failed');
+    throw new Error('Delete connection by socket id failed');
   }
+
+  return !!deletedConnection;
+};
+
+export const deleteConnectionByUserId = async (
+  userId: string,
+): Promise<boolean> => {
+  const deletedConnection = await UserConnection.destroy({
+    where: {
+      userId,
+    },
+  });
 
   return !!deletedConnection;
 };

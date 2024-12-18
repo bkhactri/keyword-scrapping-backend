@@ -67,9 +67,7 @@ describe('Scrape service', () => {
         'https://www.google.com/search?q=test&start=0',
         { waitUntil: 'domcontentloaded', timeout: 15000 },
       );
-      expect(mockWaitForSelector).toHaveBeenCalledWith('.LC20lb', {
-        timeout: 15000,
-      });
+      expect(mockWaitForSelector).toHaveBeenCalledWith('body');
       expect(mockClose).toHaveBeenCalledTimes(1);
     }, 3000);
 

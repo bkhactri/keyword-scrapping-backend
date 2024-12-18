@@ -82,12 +82,13 @@ describe('User connection service', () => {
     });
   });
 
-  describe('deleteConnection', () => {
+  describe('deleteConnectionBySocketId', () => {
     it('should delete user connection', async () => {
       mockDestroy.mockResolvedValue(1);
 
-      const result = await userConnectionService.deleteConnection(mockSocketId);
-      console.log(result);
+      const result =
+        await userConnectionService.deleteConnectionBySocketId(mockSocketId);
+
       expect(mockDestroy).toHaveBeenCalled();
       expect(mockDestroy).toHaveBeenCalledWith({
         where: { socketId: mockSocketId },
@@ -99,10 +100,26 @@ describe('User connection service', () => {
       mockDestroy.mockResolvedValue(null);
 
       await expectException({
-        fn: () => userConnectionService.deleteConnection(mockSocketId),
+        fn: () =>
+          userConnectionService.deleteConnectionBySocketId(mockSocketId),
         exceptionInstance: Error,
-        message: 'Delete user connection failed',
+        message: 'Delete connection by socket id failed',
       });
+    });
+  });
+
+  describe('deleteConnectionByUserId', () => {
+    it('should delete user connection', async () => {
+      mockDestroy.mockResolvedValue(1);
+
+      const result =
+        await userConnectionService.deleteConnectionByUserId(mockUserId);
+
+      expect(mockDestroy).toHaveBeenCalled();
+      expect(mockDestroy).toHaveBeenCalledWith({
+        where: { userId: mockUserId },
+      });
+      expect(result).toBeTruthy();
     });
   });
 });

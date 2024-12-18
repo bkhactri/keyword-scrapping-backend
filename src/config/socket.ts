@@ -23,6 +23,9 @@ export const setupSocket = (server: HTTPServer): Server => {
           { userId, socketId: socket.id },
           'User identified with socket',
         );
+
+        // Remove all current connection hold by user that not been removed before
+        await userConnection.deleteConnectionByUserId(userId);
         await userConnection.createConnection({ userId, socketId: socket.id });
       } catch (error) {
         logger.error({ error }, 'Identity user error');
@@ -32,7 +35,7 @@ export const setupSocket = (server: HTTPServer): Server => {
     socket.on('disconnect', async () => {
       try {
         logger.info({ id: socket.id }, 'A user disconnected');
-        await userConnection.deleteConnection(socket.id);
+        await userConnection.deleteConnectionBySocketId(socket.id);
       } catch (error) {
         logger.error({ error }, 'Remove disconnection user error');
       }
