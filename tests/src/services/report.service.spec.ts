@@ -5,6 +5,13 @@ import { expectException } from '@tests/helpers/expect-exception.helper';
 import * as reportService from '@src/services/report.service';
 import * as keywordService from '@src/services/keyword.service';
 import { AppError } from '@src/utils/error.util';
+import {
+  mockKeyword,
+  mockKeywordId,
+  mockScrapeContext,
+  mockSearchResultWithHtmlCachePage,
+} from '@tests/_mocks_/context-mock';
+import { KeywordStatus } from '@src/enums/keyword.enum';
 
 jest.mock('@src/services/keyword.service');
 jest.mock('@src/models/search-result.model', () => {
@@ -42,18 +49,12 @@ jest.mock('dompurify', () => {
 });
 
 describe('Report service', () => {
-  const mockContext = {
-    userId: 'mock-user-id',
-    keyword: 'key1',
-    keywordId: 1,
-  };
   const mockPayload = {
     keywordId: 1,
     totalAds: 6,
     totalLinks: 120,
     htmlCacheId: 1,
   };
-  const mockHtmlPageCache = 'mock-html-page-cache';
   const mockSearchResultCreate = SearchResultModel(sequelize)
     .create as jest.Mock;
   const mockSearchResultFindOne = SearchResultModel(sequelize)
@@ -79,16 +80,19 @@ describe('Report service', () => {
         },
       });
 
-      const result = await reportService.saveGoogleScrapeResult(mockContext, {
-        ...mockPayload,
-        htmlCachePage: mockHtmlPageCache,
-      });
+      const result = await reportService.saveGoogleScrapeResult(
+        mockScrapeContext,
+        {
+          ...mockPayload,
+          htmlCachePage: mockSearchResultWithHtmlCachePage.htmlCachePage,
+        },
+      );
 
       expect(mockSearchResultCreate).toHaveBeenCalled();
       expect(mockSearchResultCreate).toHaveBeenCalledWith(mockPayload);
       expect(mockHtmlPageCacheCreate).toHaveBeenCalled();
       expect(mockHtmlPageCacheCreate).toHaveBeenCalledWith({
-        html: mockHtmlPageCache,
+        html: mockSearchResultWithHtmlCachePage.htmlCachePage,
       });
       expect(result).toMatchObject({
         id: 1,
@@ -138,7 +142,10 @@ describe('Report service', () => {
       mockHtmlPageCacheCreate.mockRejectedValue(new Error('oops'));
 
       await expectException({
-        fn: () => reportService.saveHtmlPageCache(mockHtmlPageCache),
+        fn: () =>
+          reportService.saveHtmlPageCache(
+            mockSearchResultWithHtmlCachePage.htmlCachePage,
+          ),
         exceptionInstance: Error,
         message: 'oops',
       });
@@ -151,11 +158,13 @@ describe('Report service', () => {
         },
       });
 
-      const result = await reportService.saveHtmlPageCache(mockHtmlPageCache);
+      const result = await reportService.saveHtmlPageCache(
+        mockSearchResultWithHtmlCachePage.htmlCachePage,
+      );
 
       expect(mockHtmlPageCacheCreate).toHaveBeenCalled();
       expect(mockHtmlPageCacheCreate).toHaveBeenCalledWith({
-        html: mockHtmlPageCache,
+        html: mockSearchResultWithHtmlCachePage.htmlCachePage,
       });
       expect(result).toEqual(1);
     });
@@ -168,8 +177,8 @@ describe('Report service', () => {
       await expectException({
         fn: () =>
           reportService.getKeywordScrappedResult(
-            mockContext.userId,
-            mockContext.keywordId,
+            mockScrapeContext.userId,
+            mockScrapeContext.keywordId,
           ),
         exceptionInstance: AppError,
         message: 'Keyword not found',
@@ -178,15 +187,15 @@ describe('Report service', () => {
 
     it('should throw error if keyword status is not completed', async () => {
       (keywordService.getByKeywordId as jest.Mock).mockResolvedValue({
-        id: 1,
-        status: 'pending',
+        ...mockKeyword,
+        status: KeywordStatus.Pending,
       });
 
       await expectException({
         fn: () =>
           reportService.getKeywordScrappedResult(
-            mockContext.userId,
-            mockContext.keywordId,
+            mockScrapeContext.userId,
+            mockScrapeContext.keywordId,
           ),
         exceptionInstance: AppError,
         message: 'Can not get in-completed keyword',
@@ -195,16 +204,16 @@ describe('Report service', () => {
 
     it('should throw error if search result not found', async () => {
       (keywordService.getByKeywordId as jest.Mock).mockResolvedValue({
-        id: 1,
-        status: 'completed',
+        ...mockKeyword,
+        status: KeywordStatus.Completed,
       });
       mockSearchResultFindOne.mockResolvedValue(null);
 
       await expectException({
         fn: () =>
           reportService.getKeywordScrappedResult(
-            mockContext.userId,
-            mockContext.keywordId,
+            mockScrapeContext.userId,
+            mockScrapeContext.keywordId,
           ),
         exceptionInstance: AppError,
         message: 'Can not found search result of keyword',
@@ -213,8 +222,8 @@ describe('Report service', () => {
 
     it('should throw error if html page cache id not attached', async () => {
       (keywordService.getByKeywordId as jest.Mock).mockResolvedValue({
-        id: 1,
-        status: 'completed',
+        ...mockKeyword,
+        status: KeywordStatus.Completed,
       });
       mockSearchResultFindOne.mockResolvedValue({
         dataValues: {
@@ -225,8 +234,8 @@ describe('Report service', () => {
       await expectException({
         fn: () =>
           reportService.getKeywordScrappedResult(
-            mockContext.userId,
-            mockContext.keywordId,
+            mockScrapeContext.userId,
+            mockScrapeContext.keywordId,
           ),
         exceptionInstance: AppError,
         message: 'No html page cache attached',
@@ -235,8 +244,8 @@ describe('Report service', () => {
 
     it('should throw error if html page cache id not found', async () => {
       (keywordService.getByKeywordId as jest.Mock).mockResolvedValue({
-        id: 1,
-        status: 'completed',
+        ...mockKeyword,
+        status: KeywordStatus.Completed,
       });
       mockSearchResultFindOne.mockResolvedValue({
         dataValues: {
@@ -248,8 +257,8 @@ describe('Report service', () => {
       await expectException({
         fn: () =>
           reportService.getKeywordScrappedResult(
-            mockContext.userId,
-            mockContext.keywordId,
+            mockScrapeContext.userId,
+            mockScrapeContext.keywordId,
           ),
         exceptionInstance: AppError,
         message: 'Can not found html page cache of keyword',
@@ -258,11 +267,8 @@ describe('Report service', () => {
 
     it('should return correct keyword scrapped result', async () => {
       (keywordService.getByKeywordId as jest.Mock).mockResolvedValue({
-        id: 1,
-        keyword: 'key1',
-        status: 'completed',
-        createdAt: 'mock-created-at',
-        updatedAt: 'mock-updated-at',
+        ...mockKeyword,
+        status: KeywordStatus.Completed,
       });
       mockSearchResultFindOne.mockResolvedValue({
         dataValues: {
@@ -278,28 +284,20 @@ describe('Report service', () => {
       });
 
       const result = await reportService.getKeywordScrappedResult(
-        mockContext.userId,
-        mockContext.keywordId,
+        mockScrapeContext.userId,
+        mockScrapeContext.keywordId,
       );
 
       expect(keywordService.getByKeywordId).toHaveBeenCalledWith(
-        mockContext.keywordId,
+        mockScrapeContext.keywordId,
       );
       expect(mockSearchResultFindOne).toHaveBeenCalledWith({
         where: {
-          keywordId: 1,
+          keywordId: mockKeywordId,
         },
       });
       expect(mockHtmlPageCacheFindByPk).toHaveBeenCalledWith(123);
-      expect(result).toMatchObject({
-        keywordId: 1,
-        keyword: 'key1',
-        totalAds: 1,
-        totalLinks: 10,
-        htmlCachePage: 'sanitized_<html></html>',
-        createdAt: 'mock-created-at',
-        updatedAt: 'mock-updated-at',
-      });
+      expect(result).toMatchObject(mockSearchResultWithHtmlCachePage);
     });
   });
 });

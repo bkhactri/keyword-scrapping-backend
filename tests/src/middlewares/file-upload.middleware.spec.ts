@@ -16,6 +16,8 @@ import {
 } from '@src/middlewares/file-upload.middleware';
 import { AppError } from '@src/utils/error.util';
 import * as keywordService from '@src/services/keyword.service';
+import { mockUser } from '@tests/_mocks_/context-mock';
+import { KeywordStatus } from '@src/enums/keyword.enum';
 
 jest.mock('bullmq');
 jest.mock('ioredis');
@@ -24,8 +26,7 @@ jest.mock('@src/services/keyword.service');
 describe('File upload middleware', () => {
   describe('fileUploadMiddleware', () => {
     let app: express.Application;
-    const user = { id: 'mock-user-id', username: 'testuser' };
-    const token = jwt.sign(user, process.env.JWT_SECRET);
+    const token = jwt.sign(mockUser, process.env.JWT_SECRET);
 
     beforeAll(async () => {
       const server = await createServer();
@@ -78,21 +79,21 @@ describe('File upload middleware', () => {
       (keywordService.createBulk as jest.Mock).mockResolvedValue([
         {
           id: 1,
-          userId: 'mock-user-id',
+          userId: mockUser.id,
           keyword: 'keyword1',
-          status: 'pending',
+          status: KeywordStatus.Pending,
         },
         {
           id: 2,
-          userId: 'mock-user-id',
+          userId: mockUser.id,
           keyword: 'keyword2',
-          status: 'pending',
+          status: KeywordStatus.Pending,
         },
         {
           id: 3,
-          userId: 'mock-user-id',
+          userId: mockUser.id,
           keyword: 'keyword3',
-          status: 'pending',
+          status: KeywordStatus.Pending,
         },
       ]);
 

@@ -3,6 +3,7 @@ import sequelize from '@src/config/database';
 import { expectException } from '@tests/helpers/expect-exception.helper';
 import * as userService from '@src/services/user.service';
 import { AppError } from '@src/utils/error.util';
+import { mockUserId } from '@tests/_mocks_/context-mock';
 
 jest.mock('@src/models/user.model', () => {
   const mockUserModel = {
@@ -12,7 +13,6 @@ jest.mock('@src/models/user.model', () => {
 });
 
 describe('User service', () => {
-  const mockUserId = 'mock-user-id';
   const mockFindByPk = UserModel(sequelize).findByPk as jest.Mock;
 
   afterEach(() => {

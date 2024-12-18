@@ -1,5 +1,5 @@
 import express from 'express';
-import * as reportController from '@/src/controllers/report.controller';
+import * as reportController from '@src/controllers/report.controller';
 
 const router = express.Router();
 

@@ -5,6 +5,7 @@ import {
   responseMock,
   nextFuncMock,
 } from '@tests/_mocks_/server-mock';
+import { HttpStatus } from '@src/enums/http-status.enum';
 
 describe('Error handler middleware', () => {
   afterEach(() => {
@@ -13,13 +14,12 @@ describe('Error handler middleware', () => {
 
   it('should handle AppError correctly', () => {
     const message = 'Test AppError';
-    const statusCode = 400;
     const details = { field: 'email', message: 'invalid' };
-    const err = new AppError(message, statusCode, true, details);
+    const err = new AppError(message, HttpStatus.BadRequest, true, details);
 
     errorHandler(err, requestMock, responseMock, nextFuncMock);
 
-    expect(responseMock.status).toHaveBeenCalledWith(statusCode);
+    expect(responseMock.status).toHaveBeenCalledWith(HttpStatus.BadRequest);
     expect(responseMock.json).toHaveBeenCalledWith({
       message,
       details,
@@ -28,12 +28,13 @@ describe('Error handler middleware', () => {
 
   it('should handle AppError without details', () => {
     const message = 'Test AppError without details';
-    const statusCode = 500;
-    const err = new AppError(message, statusCode, true);
+    const err = new AppError(message, HttpStatus.InternalServerError, true);
 
     errorHandler(err, requestMock, responseMock, nextFuncMock);
 
-    expect(responseMock.status).toHaveBeenCalledWith(statusCode);
+    expect(responseMock.status).toHaveBeenCalledWith(
+      HttpStatus.InternalServerError,
+    );
     expect(responseMock.json).toHaveBeenCalledWith({
       message,
       details: undefined,
@@ -47,7 +48,7 @@ describe('Error handler middleware', () => {
 
     errorHandler(err, requestMock, responseMock, nextFuncMock);
 
-    expect(responseMock.status).toHaveBeenCalledWith(400);
+    expect(responseMock.status).toHaveBeenCalledWith(HttpStatus.BadRequest);
     expect(responseMock.json).toHaveBeenCalledWith({
       message,
       details,
@@ -59,7 +60,9 @@ describe('Error handler middleware', () => {
 
     errorHandler(err, requestMock, responseMock, nextFuncMock);
 
-    expect(responseMock.status).toHaveBeenCalledWith(500);
+    expect(responseMock.status).toHaveBeenCalledWith(
+      HttpStatus.InternalServerError,
+    );
     expect(responseMock.json).toHaveBeenCalledWith({
       message: 'Generic error',
     });
@@ -70,7 +73,9 @@ describe('Error handler middleware', () => {
 
     errorHandler(err, requestMock, responseMock, nextFuncMock);
 
-    expect(responseMock.status).toHaveBeenCalledWith(500);
+    expect(responseMock.status).toHaveBeenCalledWith(
+      HttpStatus.InternalServerError,
+    );
     expect(responseMock.json).toHaveBeenCalledWith({
       message: 'Unexpected token o in JSON at position 1',
     });
@@ -81,7 +86,9 @@ describe('Error handler middleware', () => {
 
     errorHandler(err, requestMock, responseMock, nextFuncMock);
 
-    expect(responseMock.status).toHaveBeenCalledWith(500);
+    expect(responseMock.status).toHaveBeenCalledWith(
+      HttpStatus.InternalServerError,
+    );
     expect(responseMock.json).toHaveBeenCalledWith({
       message: 'Something went wrong!',
     });

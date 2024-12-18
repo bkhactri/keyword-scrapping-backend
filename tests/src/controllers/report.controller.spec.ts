@@ -7,6 +7,11 @@ import * as reportController from '@src/controllers/report.controller';
 import * as reportService from '@src/services/report.service';
 import { HttpStatus } from '@src/enums/http-status.enum';
 import { BadRequestError } from '@src/utils/error.util';
+import {
+  mockKeywordId,
+  mockSearchResult,
+  mockUser,
+} from '@tests/_mocks_/context-mock';
 
 jest.mock('@src/services/report.service');
 
@@ -15,17 +20,11 @@ describe('Report controller', () => {
     jest.clearAllMocks();
   });
 
-  describe('getUserInfo', () => {
-    const mockUser = {
-      id: 'mock-user-id',
-      email: 'mock-user-email',
-      firstName: 'mock-first-name',
-      lastName: 'mock-last-name',
-    };
-
+  describe('getKeywordScrappedResult', () => {
     it('should throw error if keyword id param is not valid', async () => {
+      const mockInvalidKeywordId = 'mock-keyword-id';
       requestMock.user = mockUser;
-      requestMock.params.keywordId = 'mock-keyword';
+      requestMock.params.keywordId = mockInvalidKeywordId;
 
       await reportController.getKeywordScrappedResult(
         requestMock,
@@ -41,17 +40,11 @@ describe('Report controller', () => {
 
     it('should return report keyword detail and return 200 if successful', async () => {
       requestMock.user = mockUser;
-      requestMock.params.keywordId = '1010';
+      requestMock.params.keywordId = mockKeywordId.toString();
 
-      (reportService.getKeywordScrappedResult as jest.Mock).mockResolvedValue({
-        keywordId: 1,
-        keyword: 'key1',
-        totalAds: 1,
-        totalLinks: 10,
-        htmlCachePage: 'sanitized_<html></html>',
-        createdAt: 'mock-created-at',
-        updatedAt: 'mock-updated-at',
-      });
+      (reportService.getKeywordScrappedResult as jest.Mock).mockResolvedValue(
+        mockSearchResult,
+      );
 
       await reportController.getKeywordScrappedResult(
         requestMock,
@@ -61,18 +54,10 @@ describe('Report controller', () => {
 
       expect(reportService.getKeywordScrappedResult).toHaveBeenCalledWith(
         mockUser.id,
-        1010,
+        Number(mockKeywordId),
       );
       expect(responseMock.status).toHaveBeenCalledWith(HttpStatus.Ok);
-      expect(responseMock.json).toHaveBeenCalledWith({
-        keywordId: 1,
-        keyword: 'key1',
-        totalAds: 1,
-        totalLinks: 10,
-        htmlCachePage: 'sanitized_<html></html>',
-        createdAt: 'mock-created-at',
-        updatedAt: 'mock-updated-at',
-      });
+      expect(responseMock.json).toHaveBeenCalledWith(mockSearchResult);
     });
   });
 });

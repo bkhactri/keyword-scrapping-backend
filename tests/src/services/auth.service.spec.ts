@@ -1,15 +1,16 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import {
-  UserAttributes,
-  UserSignUpPayload,
-  UserSignInPayload,
-} from '@src/interfaces/user.interface';
 import { AppError } from '@src/utils/error.util';
 import UserModel from '@src/models/user.model';
 import sequelize from '@src/config/database';
 import * as authService from '@src/services/auth.service';
 import { expectException } from '@tests/helpers/expect-exception.helper';
+import {
+  mockAccessToken,
+  mockUserAttributes,
+  userSignInPayload,
+  userSignUpPayload,
+} from '@tests/_mocks_/context-mock';
 
 jest.mock('bcrypt', () => ({
   hash: jest.fn(),
@@ -33,27 +34,6 @@ describe('Auth service', () => {
   const mockCompareSync = bcrypt.compareSync as jest.Mock;
   const mockSign = jwt.sign as jest.Mock;
 
-  const mockUser: UserAttributes = {
-    id: 'mock-user-id',
-    email: 'test@example.com',
-    passwordHash: 'hashedPassword',
-    firstName: 'mock first name',
-    lastName: 'mock last name',
-    createdAt: new Date('2024-12-13 07:55:17.615+00'),
-  };
-
-  const userSignUpPayload: UserSignUpPayload = {
-    email: 'test@example.com',
-    password: 'password',
-    firstName: 'mock first name',
-    lastName: 'mock last name',
-  };
-
-  const userSignInPayload: UserSignInPayload = {
-    email: 'test@example.com',
-    password: 'password',
-  };
-
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -61,10 +41,10 @@ describe('Auth service', () => {
   describe('signup', () => {
     it('should create a new user and return the user object', async () => {
       mockFindOne.mockResolvedValue(null);
-      mockHash.mockResolvedValue('hashedPassword');
+      mockHash.mockResolvedValue(mockUserAttributes.passwordHash);
       mockCreate.mockResolvedValue({
         dataValues: {
-          ...mockUser,
+          ...mockUserAttributes,
         },
       });
 
@@ -76,20 +56,20 @@ describe('Auth service', () => {
       expect(mockHash).toHaveBeenCalledWith(userSignUpPayload.password, 10);
       expect(mockCreate).toHaveBeenCalledWith({
         ...userSignUpPayload,
-        passwordHash: 'hashedPassword',
+        passwordHash: mockUserAttributes.passwordHash,
       });
       expect(newUser).toMatchObject({
-        id: 'mock-user-id',
-        email: 'test@example.com',
-        firstName: 'mock first name',
-        lastName: 'mock last name',
+        id: mockUserAttributes.id,
+        email: mockUserAttributes.email,
+        firstName: mockUserAttributes.firstName,
+        lastName: mockUserAttributes.lastName,
       });
     });
 
     it('should throw BadRequestError if email already exists', async () => {
       mockFindOne.mockResolvedValue({
         dataValues: {
-          ...mockUser,
+          ...mockUserAttributes,
         },
       });
 
@@ -106,34 +86,34 @@ describe('Auth service', () => {
     it('should return a token if credentials are valid', async () => {
       mockFindOne.mockResolvedValue({
         dataValues: {
-          ...mockUser,
+          ...mockUserAttributes,
         },
       });
       mockCompareSync.mockReturnValue(true);
-      mockSign.mockReturnValue('mock-token');
+      mockSign.mockReturnValue(mockAccessToken);
 
-      const token = await authService.login(userSignInPayload);
+      const user = await authService.login(userSignInPayload);
 
       expect(mockFindOne).toHaveBeenCalledWith({
         where: { email: userSignInPayload.email },
       });
       expect(mockCompareSync).toHaveBeenCalledWith(
         userSignInPayload.password,
-        mockUser.passwordHash,
+        mockUserAttributes.passwordHash,
       );
-      expect(token).toMatchObject({
-        accessToken: 'mock-token',
-        email: 'test@example.com',
-        firstName: 'mock first name',
-        id: 'mock-user-id',
-        lastName: 'mock last name',
+      expect(user).toMatchObject({
+        id: mockUserAttributes.id,
+        accessToken: mockAccessToken,
+        email: mockUserAttributes.email,
+        firstName: mockUserAttributes.firstName,
+        lastName: mockUserAttributes.lastName,
       });
     });
 
     it('should throw UnauthorizedError if credentials are invalid', async () => {
       mockFindOne.mockResolvedValue({
         dataValues: {
-          ...mockUser,
+          ...mockUserAttributes,
         },
       });
       mockCompareSync.mockReturnValue(false);
