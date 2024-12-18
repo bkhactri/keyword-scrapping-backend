@@ -8,6 +8,7 @@ let io: Server;
 
 export const setupSocket = (server: HTTPServer): Server => {
   io = new Server(server, {
+    path: '/socket',
     cors: {
       origin: '*',
       methods: ['GET', 'POST'],
