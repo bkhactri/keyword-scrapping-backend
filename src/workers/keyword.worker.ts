@@ -24,7 +24,7 @@ export const processKeyword = async (
     );
 
     const result = await scrapeService.scrapeGoogle(keyword, 0);
-    console.log({ result });
+
     if (!result) {
       logger.error({ keyword }, 'Error scrapping keyword');
       throw new Error('Error scrapping keyword');
