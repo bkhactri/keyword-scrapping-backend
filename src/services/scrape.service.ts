@@ -26,11 +26,11 @@ export const scrapeGoogle = async (
     const url = `https://www.google.com/search?q=${search}&start=${pageIndex * 10}`;
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 15000 });
     await page.waitForSelector('body');
-
+    console.log({ url });
     const numberOfTopAds = await page.evaluate(
       () => document.querySelectorAll('.KoyyGc').length,
     );
-
+    console.log({ numberOfTopAds });
     const numberOfRemainAds = await page.evaluate(
       () => document.querySelectorAll('.uEierd').length,
     );
@@ -50,6 +50,7 @@ export const scrapeGoogle = async (
       htmlCachePage,
     };
   } catch (error) {
+    console.log(error);
     logger.error({ pageIndex, search, error }, 'Error scraping page');
     await browser.close();
 

@@ -24,7 +24,7 @@ export const processKeyword = async (
     );
 
     const result = await scrapeService.scrapeGoogle(keyword, 0);
-
+    console.log({ result });
     if (!result) {
       logger.error({ keyword }, 'Error scrapping keyword');
       throw new Error('Error scrapping keyword');
@@ -48,6 +48,7 @@ export const processKeyword = async (
     logger.info({ keyword }, 'Finished processing keyword');
     return { result: `Processed: ${keyword}` };
   } catch (error) {
+    console.log(error);
     logger.error({ keyword, error }, `Error processing keyword`);
 
     // Mark keyword as failed
