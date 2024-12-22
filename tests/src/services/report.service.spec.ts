@@ -14,10 +14,17 @@ import {
 import { KeywordStatus } from '@src/enums/keyword.enum';
 
 jest.mock('@src/services/keyword.service');
+jest.mock('@src/models/keyword.model', () => {
+  const mockKeywordModel = {
+    hasOne: jest.fn(),
+  };
+  return jest.fn(() => mockKeywordModel);
+});
 jest.mock('@src/models/search-result.model', () => {
   const mockSearchResultModel = {
     create: jest.fn(),
     findOne: jest.fn(),
+    belongsTo: jest.fn(),
   };
   return jest.fn(() => mockSearchResultModel);
 });
@@ -176,10 +183,7 @@ describe('Report service', () => {
 
       await expectException({
         fn: () =>
-          reportService.getKeywordScrappedResult(
-            mockScrapeContext.userId,
-            mockScrapeContext.keywordId,
-          ),
+          reportService.getKeywordScrappedResult(mockScrapeContext.keywordId),
         exceptionInstance: AppError,
         message: 'Keyword not found',
       });
@@ -193,10 +197,7 @@ describe('Report service', () => {
 
       await expectException({
         fn: () =>
-          reportService.getKeywordScrappedResult(
-            mockScrapeContext.userId,
-            mockScrapeContext.keywordId,
-          ),
+          reportService.getKeywordScrappedResult(mockScrapeContext.keywordId),
         exceptionInstance: AppError,
         message: 'Can not get in-completed keyword',
       });
@@ -211,10 +212,7 @@ describe('Report service', () => {
 
       await expectException({
         fn: () =>
-          reportService.getKeywordScrappedResult(
-            mockScrapeContext.userId,
-            mockScrapeContext.keywordId,
-          ),
+          reportService.getKeywordScrappedResult(mockScrapeContext.keywordId),
         exceptionInstance: AppError,
         message: 'Can not found search result of keyword',
       });
@@ -233,10 +231,7 @@ describe('Report service', () => {
 
       await expectException({
         fn: () =>
-          reportService.getKeywordScrappedResult(
-            mockScrapeContext.userId,
-            mockScrapeContext.keywordId,
-          ),
+          reportService.getKeywordScrappedResult(mockScrapeContext.keywordId),
         exceptionInstance: AppError,
         message: 'No html page cache attached',
       });
@@ -256,10 +251,7 @@ describe('Report service', () => {
 
       await expectException({
         fn: () =>
-          reportService.getKeywordScrappedResult(
-            mockScrapeContext.userId,
-            mockScrapeContext.keywordId,
-          ),
+          reportService.getKeywordScrappedResult(mockScrapeContext.keywordId),
         exceptionInstance: AppError,
         message: 'Can not found html page cache of keyword',
       });
@@ -284,7 +276,6 @@ describe('Report service', () => {
       });
 
       const result = await reportService.getKeywordScrappedResult(
-        mockScrapeContext.userId,
         mockScrapeContext.keywordId,
       );
 

@@ -10,3 +10,13 @@ export const Keyword = KeywordModel(sequelize);
 export const HtmlPageCache = HtmlPageCacheModel(sequelize);
 export const SearchResult = SearchResultModel(sequelize);
 export const UserConnection = UserConnectionModel(sequelize);
+
+// Relations
+Keyword.hasOne(SearchResult, {
+  foreignKey: 'keywordId',
+  as: 'searchResult',
+});
+
+SearchResult.belongsTo(Keyword, {
+  foreignKey: 'keywordId',
+});

@@ -13,12 +13,20 @@ import {
 
 jest.mock('@src/models/keyword.model', () => {
   const mockKeywordModel = {
+    hasOne: jest.fn(),
     bulkCreate: jest.fn(),
     update: jest.fn(),
     findByPk: jest.fn(),
     findAndCountAll: jest.fn(),
   };
   return jest.fn(() => mockKeywordModel);
+});
+
+jest.mock('@src/models/search-result.model', () => {
+  const mockSearchResultModel = {
+    belongsTo: jest.fn(),
+  };
+  return jest.fn(() => mockSearchResultModel);
 });
 
 describe('Keyword service', () => {

@@ -9,17 +9,13 @@ export const getKeywordScrappedResult = async (
   next: NextFunction,
 ) => {
   try {
-    const userId = req.user?.id;
     const keywordId = parseInt(req.params?.keywordId as string, 10);
 
     if (!keywordId) {
       throw new BadRequestError('Keyword id is not valid');
     }
 
-    const result = await reportService.getKeywordScrappedResult(
-      userId as string,
-      keywordId,
-    );
+    const result = await reportService.getKeywordScrappedResult(keywordId);
 
     return res.status(HttpStatus.Ok).json(result);
   } catch (error) {

@@ -4,7 +4,7 @@ import {
   SearchResultCreationPayload,
 } from '@src/interfaces/search-result.interface';
 
-class SearchResult
+export class SearchResult
   extends Model<SearchResultAttributes, SearchResultCreationPayload>
   implements SearchResultAttributes
 {

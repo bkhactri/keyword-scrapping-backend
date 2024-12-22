@@ -63,7 +63,6 @@ export const saveHtmlPageCache = async (
 };
 
 export const getKeywordScrappedResult = async (
-  userId: string,
   keywordId: number,
 ): Promise<ReportKeywordDto> => {
   try {
@@ -77,40 +76,55 @@ export const getKeywordScrappedResult = async (
       throw new BadRequestError('Can not get in-completed keyword');
     }
 
-    const searchResultData = await SearchResult.findOne({
-      where: {
-        keywordId: keywordInfo.id,
-      },
-    });
+    const searchResultData = await getSearchResultByKeywordId(keywordInfo.id);
 
-    if (!searchResultData?.dataValues) {
-      throw new BadRequestError('Can not found search result of keyword');
-    }
-
-    const htmlPageCacheId = searchResultData?.dataValues?.htmlCacheId;
-    if (!htmlPageCacheId) {
-      throw new BadRequestError('No html page cache attached');
-    }
-
-    const htmlPageCache = await HtmlPageCache.findByPk(
-      htmlPageCacheId as number,
+    const htmlCachePage = await getHtmlPageCacheById(
+      searchResultData?.htmlCacheId as number,
     );
-
-    if (!htmlPageCache?.dataValues) {
-      throw new BadRequestError('Can not found html page cache of keyword');
-    }
-
-    // Sanitize HTML page cache
-    const window = new JSDOM('').window;
-    const purify = DOMPurify(window);
-    const cleanHtmlPageCache = purify.sanitize(htmlPageCache?.dataValues.html);
 
     return new ReportKeywordDto({
       keyword: keywordInfo,
-      searchResults: searchResultData.dataValues,
-      htmlCachePage: cleanHtmlPageCache,
+      searchResults: searchResultData,
+      htmlCachePage,
     });
   } catch (error) {
     throw error;
   }
+};
+
+export const getSearchResultByKeywordId = async (
+  keywordId: number,
+): Promise<SearchResultAttributes> => {
+  const searchResultData = await SearchResult.findOne({
+    where: {
+      keywordId,
+    },
+  });
+
+  if (!searchResultData?.dataValues) {
+    throw new BadRequestError('Can not found search result of keyword');
+  }
+
+  return searchResultData?.dataValues;
+};
+
+export const getHtmlPageCacheById = async (
+  htmlCacheId: number,
+): Promise<string> => {
+  if (!htmlCacheId) {
+    throw new BadRequestError('No html page cache attached');
+  }
+
+  const htmlPageCache = await HtmlPageCache.findByPk(htmlCacheId);
+
+  if (!htmlPageCache?.dataValues) {
+    throw new BadRequestError('Can not found html page cache of keyword');
+  }
+
+  // Sanitize HTML page cache
+  const window = new JSDOM('').window;
+  const purify = DOMPurify(window);
+  const cleanHtmlPageCache = purify.sanitize(htmlPageCache?.dataValues.html);
+
+  return cleanHtmlPageCache;
 };

@@ -1,5 +1,7 @@
 jest.mock('@src/config/logger');
 
+console.log = jest.fn();
+
 process.env = {
   HOST: 'localhost',
   PORT: '3000',

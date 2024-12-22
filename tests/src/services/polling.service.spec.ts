@@ -1,13 +1,16 @@
 import * as userConnection from '@src/services/user-connection.service';
 import * as keywordService from '@src/services/keyword.service';
+import * as reportService from '@src/services/report.service';
 import * as socketSetup from '@src/config/socket';
 import * as pollingService from '@src/services/polling.service';
 import {
   mockKeyword,
   mockKeywordId,
+  mockSearchResult,
   mockSocketId,
   mockUserId,
 } from '@tests/_mocks_/context-mock';
+import { KeywordDto } from '@src/dtos/keyword.dto';
 
 jest.mock('@src/config/socket', () => ({
   getIO: jest.fn(),
@@ -17,6 +20,9 @@ jest.mock('@src/services/user-connection.service', () => ({
 }));
 jest.mock('@src/services/keyword.service', () => ({
   getByKeywordId: jest.fn(),
+}));
+jest.mock('@src/services/report.service', () => ({
+  getSearchResultByKeywordId: jest.fn(),
 }));
 
 describe('Polling service', () => {
@@ -46,6 +52,10 @@ describe('Polling service', () => {
         mockKeyword,
       );
 
+      (reportService.getSearchResultByKeywordId as jest.Mock).mockResolvedValue(
+        mockSearchResult,
+      );
+
       await pollingService.emitKeywordUpdate(mockUserId, mockKeywordId);
 
       expect(mockIoTo.to).toHaveBeenCalled();
@@ -53,7 +63,10 @@ describe('Polling service', () => {
       expect(mockIoEmit.emit).toHaveBeenCalled();
       expect(mockIoEmit.emit).toHaveBeenCalledWith(
         'keyword-processed',
-        mockKeyword,
+        new KeywordDto({
+          ...mockKeyword,
+          searchResult: mockSearchResult,
+        }),
       );
     });
 
@@ -67,7 +80,7 @@ describe('Polling service', () => {
       expect(keywordService.getByKeywordId).not.toHaveBeenCalled();
     });
 
-    it('should return if  not found keyword', async () => {
+    it('should return if not found keyword', async () => {
       (userConnection.getByUserId as jest.Mock).mockResolvedValue({
         socketId: mockSocketId,
       });
