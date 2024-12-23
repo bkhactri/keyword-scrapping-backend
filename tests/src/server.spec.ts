@@ -18,8 +18,6 @@ describe('createServer', () => {
   });
 
   it('should configure CORS middleware', async () => {
-    // Arrange -> skip due to unnecessary
-
     // Act
     const response = await request(app).options('/');
 
@@ -28,8 +26,6 @@ describe('createServer', () => {
   });
 
   it('should configure Helmet middleware', async () => {
-    // Arrange -> skip due to unnecessary
-
     // Act
     const response = await request(app).get('/');
 
@@ -63,8 +59,6 @@ describe('createServer', () => {
   });
 
   it('should use health router', async () => {
-    // Arrange -> skip due to unnecessary
-
     // Act
     const response = await request(app).get('/api/v1/health');
 

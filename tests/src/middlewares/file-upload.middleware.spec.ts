@@ -43,8 +43,6 @@ describe('File upload middleware', () => {
     });
 
     it('should call next if no file is uploaded', async () => {
-      // Arrange -> skip due to unnecessary
-
       // Act
       const result = await supertest(app)
         .post('/api/v1/upload')

@@ -108,8 +108,6 @@ describe('Error util', () => {
 
   describe('InternalServerError', () => {
     it('should create an InternalServerError with default message', () => {
-      // Arrange -> skip due to unnecessary
-
       // Act
       const error = new InternalServerError();
 

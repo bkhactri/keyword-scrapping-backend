@@ -16,8 +16,6 @@ describe('Auth middleware', () => {
   });
 
   it('should call next with UnauthorizedError if no authorization header is provided', async () => {
-    // Arrange -> skip due to simulate error
-
     // Act
     await authMiddleware(requestMock, responseMock, nextFuncMock);
 

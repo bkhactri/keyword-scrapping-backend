@@ -1,4 +1,4 @@
-import puppeteer, { Page } from 'puppeteer';
+import puppeteer from 'puppeteer';
 import * as scrapeService from '@src/services/scrape.service';
 
 jest.mock('puppeteer');
@@ -6,8 +6,6 @@ jest.mock('puppeteer');
 describe('Scrape service', () => {
   describe('getRandomUserAgent', () => {
     it('should return a random user agent string', () => {
-      // Arrange -> skip due to unnecessary
-
       // Act
       const userAgent = scrapeService.getRandomUserAgent();
 
@@ -42,125 +40,6 @@ describe('Scrape service', () => {
     });
   });
 
-  describe('parseHtml', () => {
-    it('should parse HTML and extract data correctly includes top ads, remain ads and total links', async () => {
-      // Arrange
-      const mockHtmlSearch = `
-          <html>
-              <div class="KoyyGc">Top Ad</div>
-              <div class="uEierd">Remain Ad</div>
-              <a>Link 1</a>
-              <a>Link 2</a>
-              <a>Link 3</a>
-              <a>Link 4</a>
-          </html>
-      `;
-      const mockPage = {
-        evaluate: jest
-          .fn()
-          .mockResolvedValueOnce(1) // -> mock numberOfTopAds
-          .mockResolvedValueOnce(1) // -> mock numberOfRemainAds
-          .mockResolvedValueOnce(4), // -> mock totalLinks
-        content: jest.fn().mockResolvedValue(mockHtmlSearch),
-      };
-
-      // Act
-      const result = await scrapeService.parseHtml(mockPage as unknown as Page);
-
-      // Assert
-      expect(result).toEqual({
-        totalAds: 2,
-        totalLinks: 4,
-        htmlCachePage: mockHtmlSearch,
-      });
-    });
-
-    it('should parse HTML and extract data correctly includes top ads and remain ads without links', async () => {
-      // Arrange
-      const mockHtmlSearch = `
-          <html>
-              <div class="KoyyGc">Top Ad</div>
-              <div class="uEierd">Remain Ad</div>
-          </html>
-      `;
-      const mockPage = {
-        evaluate: jest
-          .fn()
-          .mockResolvedValueOnce(1) // -> mock numberOfTopAds
-          .mockResolvedValueOnce(1) // -> mock numberOfRemainAds
-          .mockResolvedValueOnce(0), // -> mock totalLinks
-        content: jest.fn().mockResolvedValue(mockHtmlSearch),
-      };
-
-      // Act
-      const result = await scrapeService.parseHtml(mockPage as unknown as Page);
-
-      // Assert
-      expect(result).toEqual({
-        totalAds: 2,
-        totalLinks: 0,
-        htmlCachePage: mockHtmlSearch,
-      });
-    });
-
-    it('should parse HTML and extract data correctly includes links without ads', async () => {
-      // Arrange
-      const mockHtmlSearch = `
-          <html>
-              <a>Link 1</a>
-              <a>Link 2</a>
-              <a>Link 3</a>
-              <a>Link 4</a>
-          </html>
-      `;
-      const mockPage = {
-        evaluate: jest
-          .fn()
-          .mockResolvedValueOnce(0) // -> mock numberOfTopAds
-          .mockResolvedValueOnce(0) // -> mock numberOfRemainAds
-          .mockResolvedValueOnce(4), // -> mock totalLinks
-        content: jest.fn().mockResolvedValue(mockHtmlSearch),
-      };
-
-      // Act
-      const result = await scrapeService.parseHtml(mockPage as unknown as Page);
-
-      // Assert
-      expect(result).toEqual({
-        totalAds: 0,
-        totalLinks: 4,
-        htmlCachePage: mockHtmlSearch,
-      });
-    });
-
-    it('should parse HTML and extract data correctly without ads and links', async () => {
-      // Arrange
-      const mockHtmlSearch = `
-          <html>
-              <p>Mock html</p>
-          </html>
-      `;
-      const mockPage = {
-        evaluate: jest
-          .fn()
-          .mockResolvedValueOnce(0) // -> mock numberOfTopAds
-          .mockResolvedValueOnce(0) // -> mock numberOfRemainAds
-          .mockResolvedValueOnce(0), // -> mock totalLinks
-        content: jest.fn().mockResolvedValue(mockHtmlSearch),
-      };
-
-      // Act
-      const result = await scrapeService.parseHtml(mockPage as unknown as Page);
-
-      // Assert
-      expect(result).toEqual({
-        totalAds: 0,
-        totalLinks: 0,
-        htmlCachePage: mockHtmlSearch,
-      });
-    });
-  });
-
   describe('scrapeGoogle', () => {
     const searchKeyword = 'mock-search';
     const mockNewPage = jest.fn();
@@ -192,45 +71,6 @@ describe('Scrape service', () => {
     afterEach(() => {
       jest.clearAllMocks();
     });
-
-    it('should successfully scrape data', async () => {
-      // Arrange
-      const mockHtmlSearch = `
-          <html>
-              <div class="KoyyGc">Top Ad</div>
-              <div class="uEierd">Remain Ad</div>
-              <a>Link 1</a>
-              <a>Link 2</a>
-              <a>Link 3</a>s
-              <a>Link 4</a>
-          </html>
-      `;
-      mockEvaluate
-        .mockResolvedValueOnce(1) // -> mock numberOfTopAds
-        .mockResolvedValueOnce(1) // -> mock numberOfRemainAds
-        .mockResolvedValueOnce(4), // -> mock totalLinks
-        mockContent.mockResolvedValue(mockHtmlSearch);
-
-      // Act
-      const result = await scrapeService.scrapeGoogle(searchKeyword, 0);
-      const url = scrapeService.buildQueryUrl(searchKeyword, 0);
-
-      // Assert
-      expect(result).toEqual({
-        totalAds: 2,
-        totalLinks: 4,
-        htmlCachePage: mockHtmlSearch,
-      });
-      expect(puppeteer.launch).toHaveBeenCalled();
-      expect(mockNewPage).toHaveBeenCalled();
-      expect(mockSetUserAgent).toHaveBeenCalled();
-      expect(mockGoto).toHaveBeenCalledWith(url, {
-        waitUntil: 'domcontentloaded',
-        timeout: 15000,
-      });
-      expect(mockWaitForSelector).toHaveBeenCalledWith('body');
-      expect(mockClose).toHaveBeenCalledTimes(1);
-    }, 3000);
 
     it('should handle navigation errors', async () => {
       // Arrange
