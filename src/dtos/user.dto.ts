@@ -15,6 +15,7 @@ export class UserDto {
     this.firstName = user.firstName;
     this.lastName = user.lastName;
     this.createdAt = user.createdAt;
+    this.updatedAt = user.updatedAt;
     this.accessToken = user?.accessToken;
   }
 }

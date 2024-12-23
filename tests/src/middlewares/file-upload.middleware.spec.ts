@@ -4,12 +4,11 @@ import path from 'path';
 import supertest from 'supertest';
 import createServer from '@src/server';
 import jwt from 'jsonwebtoken';
-
 import multer from 'multer';
 import { fileUploadMiddleware } from '@src/middlewares/file-upload.middleware';
 import * as keywordService from '@src/services/keyword.service';
-import { mockUser } from '@tests/_mocks_/context-mock';
-import { KeywordStatus } from '@src/enums/keyword.enum';
+import { mockUserTokenPayload } from '@tests/_mocks_/user-mock';
+import { mockKeywordDto } from '@tests/_mocks_/keyword-mock';
 
 jest.mock('bullmq');
 jest.mock('ioredis');
@@ -18,7 +17,10 @@ jest.mock('@src/services/keyword.service');
 describe('File upload middleware', () => {
   describe('fileUploadMiddleware', () => {
     let app: express.Application;
-    const token = jwt.sign(mockUser, process.env.JWT_SECRET);
+    const mockAccessToken = jwt.sign(
+      mockUserTokenPayload,
+      process.env.JWT_SECRET,
+    );
 
     beforeAll(async () => {
       const server = await createServer();
@@ -41,47 +43,37 @@ describe('File upload middleware', () => {
     });
 
     it('should call next if no file is uploaded', async () => {
-      await supertest(app)
+      // Arrange -> skip due to unnecessary
+
+      // Act
+      const result = await supertest(app)
         .post('/api/v1/upload')
-        .set('Authorization', `Bearer ${token}`)
-        .expect(400)
-        .expect((res) => {
-          expect(res.body.message).toEqual('Please upload a CSV file');
-        });
+        .set('Authorization', `Bearer ${mockAccessToken}`);
+
+      // Assert
+      expect(result.status).toEqual(400);
+      expect(result.body.message).toEqual('Please upload a CSV file');
     });
 
     it('should call next if file size is within the limit', async () => {
+      // Arrange
       (keywordService.createBulk as jest.Mock).mockResolvedValue([
-        {
-          id: 1,
-          userId: mockUser.id,
-          keyword: 'keyword1',
-          status: KeywordStatus.Pending,
-        },
-        {
-          id: 2,
-          userId: mockUser.id,
-          keyword: 'keyword2',
-          status: KeywordStatus.Pending,
-        },
-        {
-          id: 3,
-          userId: mockUser.id,
-          keyword: 'keyword3',
-          status: KeywordStatus.Pending,
-        },
+        mockKeywordDto,
       ]);
-
-      const csvContent = 'Keyword\nkeyword1\nkeyword2\nkeyword3';
+      const csvContent = 'Keyword\nmock-keyword';
       const filePath = path.join(__dirname, 'test.csv');
       fs.writeFileSync(filePath, csvContent);
 
-      await supertest(app)
+      // Act
+      const result = await supertest(app)
         .post('/api/v1/upload')
-        .set('Authorization', `Bearer ${token}`)
-        .attach('file', filePath)
-        .expect(200);
+        .set('Authorization', `Bearer ${mockAccessToken}`)
+        .attach('file', filePath);
 
+      // Assert
+      expect(result.status).toEqual(200);
+
+      // Cleanup
       fs.unlinkSync(filePath);
     });
   });

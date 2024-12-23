@@ -10,10 +10,12 @@ import {
 describe('Error util', () => {
   describe('AppError', () => {
     it('should create an AppError with correct data', () => {
+      // Arrange
       const message = 'Test error message';
       const isOperational = true;
       const details = { extra: 'info' };
 
+      // Act
       const error = new AppError(
         message,
         HttpStatus.BadRequest,
@@ -21,6 +23,7 @@ describe('Error util', () => {
         details,
       );
 
+      // Assert
       expect(error).toBeInstanceOf(AppError);
       expect(error.message).toBe(message);
       expect(error.statusCode).toBe(HttpStatus.BadRequest);
@@ -29,15 +32,18 @@ describe('Error util', () => {
     });
 
     it('should create an AppError without details', () => {
+      // Arrange
       const message = 'Test error message without details';
       const isOperational = false;
 
+      // Act
       const error = new AppError(
         message,
         HttpStatus.InternalServerError,
         isOperational,
       );
 
+      // Assert
       expect(error).toBeInstanceOf(AppError);
       expect(error.message).toBe(message);
       expect(error.statusCode).toBe(HttpStatus.InternalServerError);
@@ -48,10 +54,14 @@ describe('Error util', () => {
 
   describe('BadRequestError', () => {
     it('should create a BadRequestError with correct data', () => {
+      // Arrange
       const message = 'Bad request';
       const details = { field: 'email', message: 'is invalid' };
+
+      // Act
       const error = new BadRequestError(message, details);
 
+      // Assert
       expect(error).toBeInstanceOf(AppError);
       expect(error.message).toBe(message);
       expect(error.statusCode).toBe(HttpStatus.BadRequest);
@@ -62,10 +72,14 @@ describe('Error util', () => {
 
   describe('UnauthorizedError', () => {
     it('should create a UnauthorizedError with correct data', () => {
+      // Arrange
       const message = 'Unauthorized';
       const details = { message: 'Invalid token' };
+
+      // Act
       const error = new UnauthorizedError(message, details);
 
+      // Assert
       expect(error).toBeInstanceOf(AppError);
       expect(error.message).toBe(message);
       expect(error.statusCode).toBe(HttpStatus.Unauthorized);
@@ -76,10 +90,14 @@ describe('Error util', () => {
 
   describe('NotFoundError', () => {
     it('should create a NotFoundError with correct data', () => {
+      // Arrange
       const message = 'Not found';
       const details = { id: 1 };
+
+      // Act
       const error = new NotFoundError(message, details);
 
+      // Assert
       expect(error).toBeInstanceOf(AppError);
       expect(error.message).toBe(message);
       expect(error.statusCode).toBe(HttpStatus.NotFound);
@@ -90,8 +108,12 @@ describe('Error util', () => {
 
   describe('InternalServerError', () => {
     it('should create an InternalServerError with default message', () => {
+      // Arrange -> skip due to unnecessary
+
+      // Act
       const error = new InternalServerError();
 
+      // Assert
       expect(error).toBeInstanceOf(AppError);
       expect(error.message).toBe('Internal Server Error');
       expect(error.statusCode).toBe(HttpStatus.InternalServerError);
@@ -100,10 +122,14 @@ describe('Error util', () => {
     });
 
     it('should create an InternalServerError with custom message and details', () => {
+      // Arrange
       const message = 'Custom internal server error';
       const details = { reason: 'database connection failed' };
+
+      // Act
       const error = new InternalServerError(message, details);
 
+      // Assert
       expect(error).toBeInstanceOf(AppError);
       expect(error.message).toBe(message);
       expect(error.statusCode).toBe(HttpStatus.InternalServerError);

@@ -1,13 +1,19 @@
 import {
-  requestMock,
-  responseMock,
+  getResponseMock,
+  getRequestMock,
   nextFuncMock,
 } from '@tests/_mocks_/server-mock';
 import * as fileController from '@src/controllers/file.controller';
 import { AppError } from '@src/utils/error.util';
 import * as fileService from '@src/services/file.service';
 import * as keywordService from '@src/services/keyword.service';
-import { mockKeywords } from '@tests/_mocks_/context-mock';
+import * as queueService from '@src/services/queue.service';
+import {
+  mockKeywordAttributes,
+  mockKeywordRawList,
+} from '@tests/_mocks_/keyword-mock';
+import { mockUserId, mockUserTokenPayload } from '@tests/_mocks_/user-mock';
+import { KeywordStatus } from '@src/enums/keyword.enum';
 
 jest.mock('bullmq');
 jest.mock('ioredis');
@@ -20,19 +26,28 @@ jest.mock('@src/services/file.service', () => ({
 jest.mock('@src/services/keyword.service', () => ({
   createBulk: jest.fn(),
 }));
+jest.mock('@src/services/queue.service', () => ({
+  enqueueKeywordProcessing: jest.fn(),
+}));
 
 describe('File controller', () => {
+  const requestMock = getRequestMock();
+  const responseMock = getResponseMock();
   const mockParseCSV = fileService.parseCSV as jest.Mock;
   const mockCreateBulk = keywordService.createBulk as jest.Mock;
 
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
   describe('uploadFile', () => {
-    it('should return 400 with validation errors if validation fails', async () => {
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it('should return 400 with validation errors if not provide file', async () => {
+      // Arrange - skip due to simulate error issue
+
+      // Act
       await fileController.uploadFile(requestMock, responseMock, nextFuncMock);
 
+      // Assert
       expect(nextFuncMock).toHaveBeenCalledWith(expect.any(AppError));
       expect(nextFuncMock).toHaveBeenCalledWith(
         expect.objectContaining({ message: 'Please upload a CSV file' }),
@@ -40,21 +55,57 @@ describe('File controller', () => {
     });
 
     it('should return 400 with validation errors if save keywords errors', async () => {
+      // Arrange
       requestMock.file = {
         mimetype: 'application/json',
       } as Express.Multer.File;
 
-      mockParseCSV.mockResolvedValue(mockKeywords);
+      mockParseCSV.mockResolvedValue(mockKeywordRawList);
       mockCreateBulk.mockResolvedValue([]);
 
+      // Act
       await fileController.uploadFile(requestMock, responseMock, nextFuncMock);
 
+      // Assert
       expect(nextFuncMock).toHaveBeenCalledWith(expect.any(AppError));
       expect(nextFuncMock).toHaveBeenCalledWith(
         expect.objectContaining({
           message: 'Save keywords error, can not continue to process',
         }),
       );
+    });
+
+    it('should enqueue saved keywords for processing', async () => {
+      // Arrange
+      requestMock.user = mockUserTokenPayload;
+      requestMock.file = {
+        mimetype: 'application/json',
+      } as Express.Multer.File;
+
+      mockParseCSV.mockResolvedValue(mockKeywordRawList);
+      mockCreateBulk.mockResolvedValue(
+        mockKeywordRawList.map((keyword, index) => ({
+          id: index + 1,
+          userId: mockUserId,
+          status: KeywordStatus.Pending,
+          keyword,
+        })),
+      );
+
+      // Act
+      await fileController.uploadFile(requestMock, responseMock, nextFuncMock);
+
+      // Assert
+      expect(queueService.enqueueKeywordProcessing).toHaveBeenCalledTimes(
+        mockKeywordRawList.length,
+      );
+      mockKeywordRawList.forEach((keyword, index) => {
+        expect(queueService.enqueueKeywordProcessing).toHaveBeenCalledWith({
+          userId: mockUserTokenPayload.id,
+          keyword,
+          keywordId: index + 1,
+        });
+      });
     });
   });
 });

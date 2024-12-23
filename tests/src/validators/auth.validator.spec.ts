@@ -1,46 +1,66 @@
+import { Request } from 'express';
 import { validationResult } from 'express-validator';
 import {
   validateSignupMiddleware,
   validateLoginMiddleware,
 } from '@src/validators/auth.validator';
 import { execMiddlewares } from '@tests/helpers/execute-middleware.helper';
-import { requestMock, responseMock } from '@tests/_mocks_/server-mock';
+import { getRequestMock, getResponseMock } from '@tests/_mocks_/server-mock';
 
 describe('Auth validator', () => {
+  const responseMock = getResponseMock();
+  let requestMock: Request;
+
+  beforeEach(() => {
+    requestMock = getRequestMock();
+  });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
 
   describe('validateSignupMiddleware', () => {
     it('should pass validation for correct input', async () => {
-      const reqMock = { ...requestMock };
+      // Arrange
       const mockBody = {
         email: 'test@example.com',
         password: 'password123',
         firstName: 'John',
         lastName: 'Doe',
       };
-      reqMock.body = mockBody;
+      requestMock.body = mockBody;
 
-      await execMiddlewares(reqMock, responseMock, validateSignupMiddleware);
+      // Act
+      await execMiddlewares(
+        requestMock,
+        responseMock,
+        validateSignupMiddleware,
+      );
+      const errors = validationResult(requestMock);
 
-      const errors = validationResult(reqMock);
+      // Assert
       expect(errors.isEmpty()).toBe(true);
     });
 
     it('should fail validation for missing fields', async () => {
-      const reqMock = { ...requestMock };
+      // Arrange
       const mockBody = {
         email: '',
         password: '',
         firstName: '',
         lastName: '',
       };
-      reqMock.body = mockBody;
+      requestMock.body = mockBody;
 
-      await execMiddlewares(reqMock, responseMock, validateSignupMiddleware);
+      // Act
+      await execMiddlewares(
+        requestMock,
+        responseMock,
+        validateSignupMiddleware,
+      );
+      const errors = validationResult(requestMock);
 
-      const errors = validationResult(reqMock);
+      // Assert
       expect(errors.isEmpty()).toBe(false);
       expect(errors.array()).toEqual(
         expect.arrayContaining([
@@ -57,30 +77,34 @@ describe('Auth validator', () => {
 
   describe('validateLoginMiddleware', () => {
     it('should pass validation for correct input', async () => {
-      const reqMock = { ...requestMock };
+      // Arrange
       const mockBody = {
         email: 'test@example.com',
         password: 'password123',
       };
-      reqMock.body = mockBody;
+      requestMock.body = mockBody;
 
-      await execMiddlewares(reqMock, responseMock, validateLoginMiddleware);
+      // Act
+      await execMiddlewares(requestMock, responseMock, validateLoginMiddleware);
+      const errors = validationResult(requestMock);
 
-      const errors = validationResult(reqMock);
+      // Assert
       expect(errors.isEmpty()).toBe(true);
     });
 
     it('should fail validation for missing fields', async () => {
-      const reqMock = { ...requestMock };
+      // Arrange
       const mockBody = {
         email: '',
         password: '',
       };
-      reqMock.body = mockBody;
+      requestMock.body = mockBody;
 
-      await execMiddlewares(reqMock, responseMock, validateLoginMiddleware);
+      // Act
+      await execMiddlewares(requestMock, responseMock, validateLoginMiddleware);
+      const errors = validationResult(requestMock);
 
-      const errors = validationResult(reqMock);
+      // Assert
       expect(errors.isEmpty()).toBe(false);
       expect(errors.array()).toEqual(
         expect.arrayContaining([

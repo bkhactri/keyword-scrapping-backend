@@ -1,11 +1,10 @@
 jest.mock('@src/config/logger');
 
-console.log = jest.fn();
-
 process.env = {
   HOST: 'localhost',
   PORT: '3000',
   NODE_ENV: 'local',
+  LOG_LEVEL: 'debug',
   SERVICE_NAME: 'mock-service-name',
   POSTGRES_DATABASE: 'mock-db',
   POSTGRES_USERNAME: 'admin',

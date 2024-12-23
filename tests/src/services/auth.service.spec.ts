@@ -8,9 +8,9 @@ import { expectException } from '@tests/helpers/expect-exception.helper';
 import {
   mockAccessToken,
   mockUserAttributes,
-  userSignInPayload,
-  userSignUpPayload,
-} from '@tests/_mocks_/context-mock';
+  mockUserSignInPayload,
+  mockUserSignUpPayload,
+} from '@tests/_mocks_/user-mock';
 
 jest.mock('bcrypt', () => ({
   hash: jest.fn(),
@@ -40,6 +40,7 @@ describe('Auth service', () => {
 
   describe('signup', () => {
     it('should create a new user and return the user object', async () => {
+      // Arrange
       mockFindOne.mockResolvedValue(null);
       mockHash.mockResolvedValue(mockUserAttributes.passwordHash);
       mockCreate.mockResolvedValue({
@@ -48,14 +49,16 @@ describe('Auth service', () => {
         },
       });
 
-      const newUser = await authService.signup(userSignUpPayload);
+      // Act
+      const newUser = await authService.signup(mockUserSignUpPayload);
 
+      // Assert
       expect(mockFindOne).toHaveBeenCalledWith({
-        where: { email: userSignUpPayload.email },
+        where: { email: mockUserSignUpPayload.email },
       });
-      expect(mockHash).toHaveBeenCalledWith(userSignUpPayload.password, 10);
+      expect(mockHash).toHaveBeenCalledWith(mockUserSignUpPayload.password, 10);
       expect(mockCreate).toHaveBeenCalledWith({
-        ...userSignUpPayload,
+        ...mockUserSignUpPayload,
         passwordHash: mockUserAttributes.passwordHash,
       });
       expect(newUser).toMatchObject({
@@ -67,14 +70,16 @@ describe('Auth service', () => {
     });
 
     it('should throw BadRequestError if email already exists', async () => {
+      // Arrange
       mockFindOne.mockResolvedValue({
         dataValues: {
           ...mockUserAttributes,
         },
       });
 
+      // Act + Assert
       await expectException({
-        fn: () => authService.signup(userSignUpPayload),
+        fn: () => authService.signup(mockUserSignUpPayload),
         exceptionInstance: AppError,
         message:
           'Email address is already in use. Please use a different email',
@@ -84,6 +89,7 @@ describe('Auth service', () => {
 
   describe('login', () => {
     it('should return a token if credentials are valid', async () => {
+      // Arrange
       mockFindOne.mockResolvedValue({
         dataValues: {
           ...mockUserAttributes,
@@ -92,13 +98,15 @@ describe('Auth service', () => {
       mockCompareSync.mockReturnValue(true);
       mockSign.mockReturnValue(mockAccessToken);
 
-      const user = await authService.login(userSignInPayload);
+      // Act
+      const user = await authService.login(mockUserSignInPayload);
 
+      // Assert
       expect(mockFindOne).toHaveBeenCalledWith({
-        where: { email: userSignInPayload.email },
+        where: { email: mockUserSignInPayload.email },
       });
       expect(mockCompareSync).toHaveBeenCalledWith(
-        userSignInPayload.password,
+        mockUserSignInPayload.password,
         mockUserAttributes.passwordHash,
       );
       expect(user).toMatchObject({
@@ -111,6 +119,7 @@ describe('Auth service', () => {
     });
 
     it('should throw UnauthorizedError if credentials are invalid', async () => {
+      // Arrange
       mockFindOne.mockResolvedValue({
         dataValues: {
           ...mockUserAttributes,
@@ -118,18 +127,21 @@ describe('Auth service', () => {
       });
       mockCompareSync.mockReturnValue(false);
 
+      // Act + Assert
       await expectException({
-        fn: () => authService.login(userSignInPayload),
+        fn: () => authService.login(mockUserSignInPayload),
         exceptionInstance: AppError,
         message: 'Incorrect username or password. Please try again',
       });
     });
 
     it('should throw UnauthorizedError if user not found', async () => {
+      // Arrange
       mockFindOne.mockResolvedValue(null);
 
+      // Act + Assert
       await expectException({
-        fn: () => authService.login(userSignInPayload),
+        fn: () => authService.login(mockUserSignInPayload),
         exceptionInstance: AppError,
         message: 'Incorrect username or password. Please try again',
       });

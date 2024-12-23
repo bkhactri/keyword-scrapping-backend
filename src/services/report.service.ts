@@ -78,6 +78,10 @@ export const getKeywordScrappedResult = async (
 
     const searchResultData = await getSearchResultByKeywordId(keywordInfo.id);
 
+    if (!searchResultData.htmlCacheId) {
+      throw new BadRequestError('No html page cache attached');
+    }
+
     const htmlCachePage = await getHtmlPageCacheById(
       searchResultData?.htmlCacheId as number,
     );
@@ -102,7 +106,7 @@ export const getSearchResultByKeywordId = async (
   });
 
   if (!searchResultData?.dataValues) {
-    throw new BadRequestError('Can not found search result of keyword');
+    throw new BadRequestError('Can not find search result of keyword');
   }
 
   return searchResultData?.dataValues;
@@ -111,20 +115,17 @@ export const getSearchResultByKeywordId = async (
 export const getHtmlPageCacheById = async (
   htmlCacheId: number,
 ): Promise<string> => {
-  if (!htmlCacheId) {
-    throw new BadRequestError('No html page cache attached');
-  }
-
   const htmlPageCache = await HtmlPageCache.findByPk(htmlCacheId);
 
   if (!htmlPageCache?.dataValues) {
     throw new BadRequestError('Can not found html page cache of keyword');
   }
 
-  // Sanitize HTML page cache
+  return sanitizeHtml(htmlPageCache?.dataValues.html);
+};
+
+export const sanitizeHtml = (html: string) => {
   const window = new JSDOM('').window;
   const purify = DOMPurify(window);
-  const cleanHtmlPageCache = purify.sanitize(htmlPageCache?.dataValues.html);
-
-  return cleanHtmlPageCache;
+  return purify.sanitize(html);
 };

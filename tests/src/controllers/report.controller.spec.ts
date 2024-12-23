@@ -1,6 +1,7 @@
+import { Request } from 'express';
 import {
-  requestMock,
-  responseMock,
+  getRequestMock,
+  getResponseMock,
   nextFuncMock,
 } from '@tests/_mocks_/server-mock';
 import * as reportController from '@src/controllers/report.controller';
@@ -9,29 +10,38 @@ import { HttpStatus } from '@src/enums/http-status.enum';
 import { BadRequestError } from '@src/utils/error.util';
 import {
   mockKeywordId,
-  mockSearchResult,
-  mockUser,
-} from '@tests/_mocks_/context-mock';
+  mockReportKeywordDto,
+} from '@tests/_mocks_/keyword-mock';
+import { mockUserTokenPayload } from '@tests/_mocks_/user-mock';
 
 jest.mock('@src/services/report.service');
 
 describe('Report controller', () => {
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
+  let requestMock: Request;
+  const responseMock = getResponseMock();
 
   describe('getKeywordScrappedResult', () => {
-    it('should throw error if keyword id param is not valid', async () => {
-      const mockInvalidKeywordId = 'mock-keyword-id';
-      requestMock.user = mockUser;
-      requestMock.params.keywordId = mockInvalidKeywordId;
+    beforeEach(() => {
+      requestMock = getRequestMock();
+      requestMock.user = mockUserTokenPayload;
+    });
 
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it('should throw error if keyword id param is not valid', async () => {
+      // Arrange
+      requestMock.params.keywordId = 'mock-keyword-id';
+
+      // Act
       await reportController.getKeywordScrappedResult(
         requestMock,
         responseMock,
         nextFuncMock,
       );
 
+      // Assert
       expect(nextFuncMock).toHaveBeenCalled();
       expect(nextFuncMock).toHaveBeenCalledWith(
         new BadRequestError('Keyword id is not valid'),
@@ -39,24 +49,26 @@ describe('Report controller', () => {
     });
 
     it('should return report keyword detail and return 200 if successful', async () => {
-      requestMock.user = mockUser;
+      // Arrange
       requestMock.params.keywordId = mockKeywordId.toString();
 
       (reportService.getKeywordScrappedResult as jest.Mock).mockResolvedValue(
-        mockSearchResult,
+        mockReportKeywordDto,
       );
 
+      // Act
       await reportController.getKeywordScrappedResult(
         requestMock,
         responseMock,
         nextFuncMock,
       );
 
+      // Act
       expect(reportService.getKeywordScrappedResult).toHaveBeenCalledWith(
-        Number(mockKeywordId),
+        mockKeywordId,
       );
       expect(responseMock.status).toHaveBeenCalledWith(HttpStatus.Ok);
-      expect(responseMock.json).toHaveBeenCalledWith(mockSearchResult);
+      expect(responseMock.json).toHaveBeenCalledWith(mockReportKeywordDto);
     });
   });
 });
