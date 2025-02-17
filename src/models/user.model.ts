@@ -10,8 +10,10 @@ class User
 {
   public id!: number;
   public email!: string;
-  public password_hash!: string;
-  public created_at!: Date;
+  public passwordHash!: string;
+  public firstName!: string;
+  public lastName!: string;
+  public createdAt!: Date;
 }
 
 const UserModel = (sequelize: Sequelize) => {
@@ -31,11 +33,19 @@ const UserModel = (sequelize: Sequelize) => {
           max: 255,
         },
       },
-      password_hash: {
+      firstName: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      created_at: {
+      lastName: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      passwordHash: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      createdAt: {
         type: DataTypes.DATE,
         allowNull: false,
         defaultValue: DataTypes.NOW,
@@ -44,7 +54,7 @@ const UserModel = (sequelize: Sequelize) => {
     {
       sequelize,
       tableName: 'users',
-      timestamps: true,
+      timestamps: false,
       indexes: [
         {
           unique: true,

@@ -1,7 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 import { validationResult, matchedData } from 'express-validator';
 import * as authService from '../services/auth.service';
-import { UserAuthenticateAttributes } from '../interfaces/user.interface';
+import {
+  UserSignUpAttributes,
+  UserSignInAttributes,
+} from '../interfaces/user.interface';
 import { HttpStatus } from '../enums/http-status.enum';
 
 export const signup = async (
@@ -15,7 +18,7 @@ export const signup = async (
   }
 
   try {
-    const validatedData = matchedData(req) as UserAuthenticateAttributes;
+    const validatedData = matchedData(req) as UserSignUpAttributes;
     const newUser = await authService.signup(validatedData);
 
     return res.status(HttpStatus.Created).json(newUser);
@@ -35,7 +38,7 @@ export const login = async (
   }
 
   try {
-    const validatedData = matchedData(req) as UserAuthenticateAttributes;
+    const validatedData = matchedData(req) as UserSignInAttributes;
     const token = await authService.login(validatedData);
 
     return res.status(HttpStatus.Ok).json({ token });

@@ -4,7 +4,8 @@ import UserModel from '../models/user.model';
 import sequelize from '../config/database';
 import {
   UserAttributes,
-  UserAuthenticateAttributes,
+  UserSignUpAttributes,
+  UserSignInAttributes,
 } from '../interfaces/user.interface';
 import { BadRequestError, UnauthorizedError } from '../utils/error.util';
 
@@ -19,7 +20,7 @@ const generateToken = (user: UserAttributes): string => {
 };
 
 export const signup = async (
-  userData: UserAuthenticateAttributes,
+  userData: UserSignUpAttributes,
 ): Promise<UserAttributes> => {
   const existingUser = await User.findOne({ where: { email: userData.email } });
   if (existingUser) {
@@ -31,20 +32,20 @@ export const signup = async (
   const hashedPassword = await bcrypt.hash(userData.password, 10);
   const newUser = await User.create({
     ...userData,
-    password_hash: hashedPassword,
+    passwordHash: hashedPassword,
   });
 
   return newUser;
 };
 
 export const login = async (
-  loginData: UserAuthenticateAttributes,
+  loginData: UserSignInAttributes,
 ): Promise<string> => {
   const user = await User.findOne({ where: { email: loginData.email } });
 
   if (
     !user ||
-    !bcrypt.compareSync(loginData.password, user.dataValues.password_hash)
+    !bcrypt.compareSync(loginData.password, user.dataValues.passwordHash)
   ) {
     throw new UnauthorizedError(
       'Incorrect username or password. Please try again',

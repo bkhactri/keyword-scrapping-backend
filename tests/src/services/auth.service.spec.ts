@@ -2,7 +2,8 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import {
   UserAttributes,
-  UserAuthenticateAttributes,
+  UserSignUpAttributes,
+  UserSignInAttributes,
 } from '@src/interfaces/user.interface';
 import { AppError } from '@src/utils/error.util';
 import UserModel from '@src/models/user.model';
@@ -35,10 +36,20 @@ describe('Auth service', () => {
   const mockUser: UserAttributes = {
     id: 1,
     email: 'test@example.com',
-    password_hash: 'hashedPassword',
-    created_at: new Date('2024-12-13 07:55:17.615+00'),
+    passwordHash: 'hashedPassword',
+    firstName: 'mock first name',
+    lastName: 'mock last name',
+    createdAt: new Date('2024-12-13 07:55:17.615+00'),
   };
-  const userData: UserAuthenticateAttributes = {
+
+  const userSignUpPayload: UserSignUpAttributes = {
+    email: 'test@example.com',
+    password: 'password',
+    firstName: 'mock first name',
+    lastName: 'mock last name',
+  };
+
+  const userSignInPayload: UserSignInAttributes = {
     email: 'test@example.com',
     password: 'password',
   };
@@ -53,15 +64,15 @@ describe('Auth service', () => {
       mockHash.mockResolvedValue('hashedPassword');
       mockCreate.mockResolvedValue(mockUser);
 
-      const newUser = await authService.signup(userData);
+      const newUser = await authService.signup(userSignUpPayload);
 
       expect(mockFindOne).toHaveBeenCalledWith({
-        where: { email: userData.email },
+        where: { email: userSignUpPayload.email },
       });
-      expect(mockHash).toHaveBeenCalledWith(userData.password, 10);
+      expect(mockHash).toHaveBeenCalledWith(userSignUpPayload.password, 10);
       expect(mockCreate).toHaveBeenCalledWith({
-        ...userData,
-        password_hash: 'hashedPassword',
+        ...userSignUpPayload,
+        passwordHash: 'hashedPassword',
       });
       expect(newUser).toEqual(mockUser);
     });
@@ -74,7 +85,7 @@ describe('Auth service', () => {
       });
 
       await expectException({
-        fn: () => authService.signup(userData),
+        fn: () => authService.signup(userSignUpPayload),
         exceptionInstance: AppError,
         message:
           'Email address is already in use. Please use a different email.',
@@ -84,10 +95,6 @@ describe('Auth service', () => {
 
   describe('login', () => {
     it('should return a token if credentials are valid', async () => {
-      const loginData: UserAuthenticateAttributes = {
-        email: 'test@example.com',
-        password: 'password',
-      };
       mockFindOne.mockResolvedValue({
         dataValues: {
           ...mockUser,
@@ -96,23 +103,19 @@ describe('Auth service', () => {
       mockCompareSync.mockReturnValue(true);
       mockSign.mockReturnValue('mock-token');
 
-      const token = await authService.login(loginData);
+      const token = await authService.login(userSignInPayload);
 
       expect(mockFindOne).toHaveBeenCalledWith({
-        where: { email: loginData.email },
+        where: { email: userSignInPayload.email },
       });
       expect(mockCompareSync).toHaveBeenCalledWith(
-        loginData.password,
-        mockUser.password_hash,
+        userSignInPayload.password,
+        mockUser.passwordHash,
       );
       expect(token).toBe('mock-token');
     });
 
     it('should throw UnauthorizedError if credentials are invalid', async () => {
-      const loginData: UserAuthenticateAttributes = {
-        email: 'test@example.com',
-        password: 'wrongPassword',
-      };
       mockFindOne.mockResolvedValue({
         dataValues: {
           ...mockUser,
@@ -121,21 +124,17 @@ describe('Auth service', () => {
       mockCompareSync.mockReturnValue(false);
 
       await expectException({
-        fn: () => authService.login(loginData),
+        fn: () => authService.login(userSignInPayload),
         exceptionInstance: AppError,
         message: 'Incorrect username or password. Please try again',
       });
     });
 
     it('should throw UnauthorizedError if user not found', async () => {
-      const loginData: UserAuthenticateAttributes = {
-        email: 'not-found@example.com',
-        password: 'password',
-      };
       mockFindOne.mockResolvedValue(null);
 
       await expectException({
-        fn: () => authService.login(loginData),
+        fn: () => authService.login(userSignInPayload),
         exceptionInstance: AppError,
         message: 'Incorrect username or password. Please try again',
       });
