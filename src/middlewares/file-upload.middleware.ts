@@ -4,7 +4,6 @@ import { BadRequestError } from '@src/utils/error.util';
 
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 1 * 1024 * 1024 },
 });
 
 export const fileUploadMiddleware = async (
@@ -14,10 +13,6 @@ export const fileUploadMiddleware = async (
 ) => {
   upload.single('file')(req, res, (err) => {
     if (err) {
-      if (err.code === 'LIMIT_FILE_SIZE') {
-        return next(new BadRequestError('File size exceeds the limit 1MB'));
-      }
-
       return next(
         new BadRequestError(
           'Oops! Something went wrong. Please try uploading the file again',
@@ -27,21 +22,4 @@ export const fileUploadMiddleware = async (
 
     next();
   });
-};
-
-export const validateFileTypeMiddleware = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const file = req.file;
-    if (!file || file.mimetype !== 'text/csv') {
-      throw new BadRequestError('Please upload a CSV file');
-    }
-
-    next();
-  } catch (error) {
-    next(error);
-  }
 };

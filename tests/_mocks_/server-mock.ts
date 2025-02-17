@@ -4,6 +4,7 @@ export const requestMock = {
   headers: {},
   query: {},
   params: {},
+  body: {},
 } as unknown as Request;
 
 export const responseMock = {

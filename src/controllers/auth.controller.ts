@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { validationResult, matchedData } from 'express-validator';
+import { matchedData } from 'express-validator';
 import * as authService from '@src/services/auth.service';
 import {
   UserSignUpPayload,
@@ -12,11 +12,6 @@ export const signup = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return next(errors.array()[0]);
-  }
-
   try {
     const validatedData = matchedData(req) as UserSignUpPayload;
     const newUserInfo = await authService.signup(validatedData);
@@ -32,11 +27,6 @@ export const login = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return next(errors.array()[0]);
-  }
-
   try {
     const validatedData = matchedData(req) as UserSignInPayload;
     const authenticatedInfo = await authService.login(validatedData);
