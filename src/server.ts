@@ -7,6 +7,7 @@ import { healthRouter } from './routes/health.route';
 import { authRouter } from './routes/auth.route';
 import { fileUploadRouter } from './routes/file.route';
 import { userRouter } from './routes/user.route';
+import { keywordRouter } from './routes/keyword.route';
 import errorHandler from './middlewares/error-handler.middleware';
 import requestLogger from './middlewares/request-logger.middleware';
 import authMiddleware from './middlewares/auth.middleware';
@@ -30,6 +31,7 @@ const createServer = async (): Promise<{ app: express.Express }> => {
   app.use('/api/v1', authRouter);
   app.use('/api/v1', authMiddleware, userRouter);
   app.use('/api/v1', authMiddleware, fileUploadRouter);
+  app.use('/api/v1', authMiddleware, keywordRouter);
 
   // Error handler middleware
   app.use(errorHandler);

@@ -9,6 +9,7 @@ jest.mock('@src/models/keyword.model', () => {
     bulkCreate: jest.fn(),
     update: jest.fn(),
     findByPk: jest.fn(),
+    findAndCountAll: jest.fn(),
   };
   return jest.fn(() => mockKeywordModel);
 });
@@ -17,9 +18,26 @@ describe('Keyword service', () => {
   const mockBulkCreate = KeywordModel(sequelize).bulkCreate as jest.Mock;
   const mockUpdate = KeywordModel(sequelize).update as jest.Mock;
   const mockFindByPk = KeywordModel(sequelize).findByPk as jest.Mock;
+  const mockFindAndCountAll = KeywordModel(sequelize)
+    .findAndCountAll as jest.Mock;
   const mockUserId = 'mock-user-id';
   const mockKeywordId = 1;
   const mockKeywords = ['key1', 'key2', 'key3'];
+  const mockKeyword = {
+    id: mockKeywordId,
+    userId: mockUserId,
+    keyword: 'key1',
+    status: KeywordStatus.Pending,
+    createdAt: 'mock-created-at',
+    updatedAt: 'mock-updated-at',
+  };
+  const mockPagination = {
+    page: 0,
+    pageSize: 20,
+  };
+  const mockFilter = {
+    search: 'mock-search',
+  };
 
   describe('createBulk', () => {
     it('should bulk create keywords and return data mapped to dto', async () => {
@@ -134,6 +152,43 @@ describe('Keyword service', () => {
         fn: () => keywordService.getByKeywordId(mockKeywordId),
         exceptionInstance: Error,
         message: 'Keyword not found',
+      });
+    });
+  });
+
+  describe('getKeywords', () => {
+    it('should return correct data base on pagination and filter', async () => {
+      mockFindAndCountAll.mockResolvedValue({
+        count: 1,
+        rows: [
+          {
+            dataValues: mockKeyword,
+          },
+        ],
+      });
+
+      const result = await keywordService.getKeywords(
+        mockUserId,
+        mockPagination,
+        mockFilter,
+      );
+
+      expect(result).toMatchObject({
+        total: 1,
+        keywords: [mockKeyword],
+        page: 0,
+        pageSize: 20,
+      });
+    });
+
+    it('should throw error if something went wrong', async () => {
+      mockFindAndCountAll.mockRejectedValue(new Error('oops'));
+
+      await expectException({
+        fn: () =>
+          keywordService.getKeywords(mockUserId, mockPagination, mockFilter),
+        exceptionInstance: Error,
+        message: 'oops',
       });
     });
   });

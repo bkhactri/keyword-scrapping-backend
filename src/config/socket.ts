@@ -18,17 +18,24 @@ export const setupSocket = (server: HTTPServer): Server => {
     logger.info({ id: socket.id }, 'A user connected');
 
     socket.on('identify', async (userId: string) => {
-      await userConnection.createConnection({ userId, socketId: socket.id });
-
-      logger.info(
-        { userId, socketId: socket.id },
-        'User identified with socket',
-      );
+      try {
+        logger.info(
+          { userId, socketId: socket.id },
+          'User identified with socket',
+        );
+        await userConnection.createConnection({ userId, socketId: socket.id });
+      } catch (error) {
+        logger.error({ error }, 'Identity user error');
+      }
     });
 
     socket.on('disconnect', async () => {
-      logger.info({ id: socket.id }, 'A user disconnected');
-      userConnection.deleteConnection(socket.id);
+      try {
+        logger.info({ id: socket.id }, 'A user disconnected');
+        await userConnection.deleteConnection(socket.id);
+      } catch (error) {
+        logger.error({ error }, 'Remove disconnection user error');
+      }
     });
   });
 

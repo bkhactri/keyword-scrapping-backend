@@ -1,4 +1,5 @@
 import { KeywordStatus } from '@src/enums/keyword.enum';
+import { Pagination } from './common.interface';
 
 export interface KeywordAttributes {
   id: number;
@@ -16,4 +17,9 @@ export interface KeywordProcessingPayload {
   userId: string;
   keyword: string;
   keywordId: number;
+}
+
+export interface KeywordList extends Pagination {
+  total: number;
+  keywords: KeywordAttributes[];
 }
