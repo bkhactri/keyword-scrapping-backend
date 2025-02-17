@@ -1,11 +1,11 @@
 import { NextFunction, Request, Response } from 'express';
 import { validationResult, matchedData } from 'express-validator';
-import * as authService from '../services/auth.service';
+import * as authService from '@src/services/auth.service';
 import {
   UserSignUpPayload,
   UserSignInPayload,
-} from '../interfaces/user.interface';
-import { HttpStatus } from '../enums/http-status.enum';
+} from '@src/interfaces/user.interface';
+import { HttpStatus } from '@src/enums/http-status.enum';
 
 export const signup = async (
   req: Request,

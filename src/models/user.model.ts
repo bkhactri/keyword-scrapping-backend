@@ -2,7 +2,7 @@ import { DataTypes, Model, Sequelize } from 'sequelize';
 import {
   UserAttributes,
   UserCreationPayload,
-} from '../interfaces/user.interface';
+} from '@src/interfaces/user.interface';
 
 class User
   extends Model<UserAttributes, UserCreationPayload>
