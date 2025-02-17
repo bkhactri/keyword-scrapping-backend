@@ -1,5 +1,5 @@
 import { Op, WhereOptions } from 'sequelize';
-import { Keyword } from '@src/models';
+import { Keyword, SearchResult } from '@src/models';
 import { KeywordStatus } from '@src/enums/keyword.enum';
 import { KeywordDto } from '@src/dtos/keyword.dto';
 import {
@@ -66,6 +66,13 @@ export const getKeywords = async (
   try {
     const { count, rows } = await Keyword.findAndCountAll({
       where: whereClause,
+      include: [
+        {
+          model: SearchResult,
+          as: 'searchResult',
+          attributes: ['totalAds', 'totalLinks'],
+        },
+      ],
       offset,
       limit,
       order: [['updatedAt', 'DESC']],
@@ -73,7 +80,13 @@ export const getKeywords = async (
 
     return {
       total: count,
-      keywords: rows.map((keyword) => new KeywordDto(keyword.dataValues)),
+      keywords: rows.map(
+        (keyword) =>
+          new KeywordDto({
+            ...keyword.dataValues,
+            searchResult: keyword.dataValues.searchResult?.dataValues,
+          }),
+      ),
       page,
       pageSize,
     };

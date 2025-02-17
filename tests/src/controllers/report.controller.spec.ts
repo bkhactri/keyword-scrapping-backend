@@ -53,7 +53,6 @@ describe('Report controller', () => {
       );
 
       expect(reportService.getKeywordScrappedResult).toHaveBeenCalledWith(
-        mockUser.id,
         Number(mockKeywordId),
       );
       expect(responseMock.status).toHaveBeenCalledWith(HttpStatus.Ok);
