@@ -29,3 +29,13 @@ export const updateKeywordStatus = async (
 
   await Keyword.update({ status }, { where: { id } });
 };
+
+export const getByKeywordId = async (id: number): Promise<KeywordDto> => {
+  const keyword = await Keyword.findByPk(id);
+
+  if (!keyword) {
+    throw new Error('Keyword not found');
+  }
+
+  return new KeywordDto(keyword.dataValues);
+};

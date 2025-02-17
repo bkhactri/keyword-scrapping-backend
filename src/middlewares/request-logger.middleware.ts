@@ -11,7 +11,7 @@ const requestLogger = (req: Request, res: Response, next: NextFunction) => {
     headers: req.headers,
   };
 
-  logger.debug({ req: reqInfo }, 'Request received');
+  logger.debug({ req: reqInfo.url }, 'Request received');
 
   res.on('finish', () => {
     const ms = Date.now() - start;

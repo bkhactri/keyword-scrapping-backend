@@ -5,13 +5,14 @@ import { KeywordStatus } from '@src/enums/keyword.enum';
 import * as keywordService from '@src/services/keyword.service';
 import * as scrapeService from '@src/services/scrape.service';
 import * as reportService from '@src/services/report.service';
+import * as pollingService from '@src/services/polling.service';
 import { ScrapeResult } from '@src/interfaces/scrape.interface';
 import { KeywordProcessingPayload } from '@src/interfaces/keyword.interface';
 
 export const processKeyword = async (
   job: Job<KeywordProcessingPayload>,
 ): Promise<{ result: string } | void> => {
-  const { keyword, keywordId } = job.data;
+  const { userId, keyword, keywordId } = job.data;
 
   try {
     logger.info({ keyword }, 'Processing keyword');
@@ -40,6 +41,8 @@ export const processKeyword = async (
         keywordId,
         KeywordStatus.Completed,
       );
+
+      await pollingService.emitKeywordUpdate(userId, keywordId);
     }
 
     logger.info({ keyword }, 'Finished processing keyword');
@@ -54,7 +57,7 @@ export const processKeyword = async (
 
 export const keywordWorker = new Worker(QUEUE_NAME, processKeyword, {
   connection: redisConnection,
-  concurrency: 100,
+  concurrency: 10,
   removeOnComplete: { count: 1000 },
   removeOnFail: { count: 500 },
   limiter: {

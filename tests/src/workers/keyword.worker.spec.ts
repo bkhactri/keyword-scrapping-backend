@@ -3,6 +3,7 @@ import * as worker from '@src/workers/keyword.worker';
 import * as keywordService from '@src/services/keyword.service';
 import * as scrapeService from '@src/services/scrape.service';
 import * as reportService from '@src/services/report.service';
+import * as pollingService from '@src/services/polling.service';
 import { KeywordProcessingPayload } from '@src/interfaces/keyword.interface';
 
 jest.mock('bullmq');
@@ -17,7 +18,9 @@ jest.mock('@src/services/scrape.service', () => ({
 jest.mock('@src/services/report.service', () => ({
   saveGoogleScrapeResult: jest.fn(),
 }));
-
+jest.mock('@src/services/polling.service', () => ({
+  emitKeywordUpdate: jest.fn(),
+}));
 interface MockJob<T> extends Job<T> {
   data: T;
 }
@@ -41,6 +44,7 @@ describe('Keyword worker', () => {
   const mockScrapeGoogle = scrapeService.scrapeGoogle as jest.Mock;
   const mockSaveGoogleScrapeResult =
     reportService.saveGoogleScrapeResult as jest.Mock;
+  const mockEmitKeywordUpdate = pollingService.emitKeywordUpdate as jest.Mock;
 
   describe('processKeyword', () => {
     afterEach(() => {
@@ -55,6 +59,7 @@ describe('Keyword worker', () => {
       mockSaveGoogleScrapeResult.mockResolvedValueOnce({
         id: 1,
       });
+      mockEmitKeywordUpdate.mockResolvedValueOnce({});
 
       const result = await worker.processKeyword(mockJob);
 
