@@ -9,6 +9,7 @@ const envVariables = z.object({
   POSTGRES_DATABASE: z.string(),
   POSTGRES_USERNAME: z.string(),
   POSTGRES_PASSWORD: z.string(),
+  POSTGRES_HOST: z.string(),
   JWT_SECRET: z.string(),
   JWT_EXPIRED_TIME: z.string(),
   REDIS_HOST: z.string(),
