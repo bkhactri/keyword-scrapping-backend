@@ -5,4 +5,4 @@ const router = express.Router();
 
 router.get('/health', healthController.healthCheck);
 
-export { router };
+export { router as healthRouter };
