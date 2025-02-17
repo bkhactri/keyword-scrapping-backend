@@ -2,8 +2,27 @@
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from '@src/utils/error.util';
 import { logger } from '@src/config/logger';
+import { validationResult } from 'express-validator';
 
-const errorHandler = (
+export const expressValidatorErrorHandler = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    const error = errors.array()[0];
+    return next({
+      type: error?.type,
+      message: error?.msg,
+    });
+  }
+
+  next();
+};
+
+export const errorHandler = (
   err: Error,
   req: Request,
   res: Response,
@@ -27,5 +46,3 @@ const errorHandler = (
     });
   }
 };
-
-export default errorHandler;

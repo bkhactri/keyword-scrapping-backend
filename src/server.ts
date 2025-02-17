@@ -10,7 +10,7 @@ import { fileUploadRouter } from './routes/file.route';
 import { userRouter } from './routes/user.route';
 import { keywordRouter } from './routes/keyword.route';
 import { reportRouter } from './routes/report.route';
-import errorHandler from './middlewares/error-handler.middleware';
+import { errorHandler } from './middlewares/error-handler.middleware';
 import requestLogger from './middlewares/request-logger.middleware';
 import authMiddleware from './middlewares/auth.middleware';
 

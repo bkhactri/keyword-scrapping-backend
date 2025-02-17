@@ -1,8 +1,6 @@
 import { Router } from 'express';
-import {
-  fileUploadMiddleware,
-  validateFileTypeMiddleware,
-} from '@src/middlewares/file-upload.middleware';
+import { fileUploadMiddleware } from '@src/middlewares/file-upload.middleware';
+import { validateFileTypeMiddleware } from '@src/validators/file.validator';
 import * as fileController from '@src/controllers/file.controller';
 
 const router = Router();
