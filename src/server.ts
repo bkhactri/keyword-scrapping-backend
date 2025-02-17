@@ -2,6 +2,7 @@ import express, { RequestHandler } from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import compression from 'compression';
+import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import { healthRouter } from './routes/health.route';
 import { authRouter } from './routes/auth.route';
@@ -23,6 +24,16 @@ const createServer = async (): Promise<{ app: express.Express }> => {
   app.use(compression());
   app.use(bodyParser.json({ limit: '5mb' }) as RequestHandler);
   app.use(bodyParser.urlencoded({ extended: true }) as RequestHandler);
+
+  const limiter = rateLimit({
+    windowMs: 2 * 60 * 1000,
+    max: 100,
+    message: 'Too many requests from this IP, please try again later',
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+
+  app.use(limiter);
 
   // Logger
   app.use(requestLogger);
