@@ -48,6 +48,7 @@ export const processKeyword = async (
     logger.info({ keyword }, 'Finished processing keyword');
     return { result: `Processed: ${keyword}` };
   } catch (error) {
+    console.log(error);
     logger.error({ keyword, error }, `Error processing keyword`);
 
     // Mark keyword as failed

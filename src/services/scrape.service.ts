@@ -7,7 +7,10 @@ export const scrapeGoogle = async (
   search: string,
   pageIndex: number,
 ): Promise<ScrapeResult | null> => {
-  const browser = await puppeteer.launch({ headless: true });
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  });
   const page = await browser.newPage();
   const userAgent = randomUserAgent.getRandom();
   await page.setUserAgent(userAgent as string);
@@ -50,6 +53,7 @@ export const scrapeGoogle = async (
       htmlCachePage,
     };
   } catch (error) {
+    console.log(error);
     logger.error({ pageIndex, search, error }, 'Error scraping page');
     await browser.close();
 
