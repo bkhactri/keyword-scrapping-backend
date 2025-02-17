@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 import { z } from 'zod';
-import { UserTokenPayload } from '../interfaces/user.interface';
+import { UserTokenPayload } from '@src/interfaces/user.interface';
 
 const envVariables = z.object({
   HOST: z.string().optional(),
