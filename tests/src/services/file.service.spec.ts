@@ -1,4 +1,3 @@
-import * as csv from 'fast-csv';
 import { AppError } from '@src/utils/error.util';
 import { parseCSV, validateKeywords } from '@src/services/file.service';
 import { expectException } from '@/tests/helpers/expect-exception.helper';

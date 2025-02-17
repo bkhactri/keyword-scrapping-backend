@@ -8,20 +8,21 @@ class User
   extends Model<UserAttributes, UserCreationPayload>
   implements UserAttributes
 {
-  public id!: number;
+  public id!: string;
   public email!: string;
   public passwordHash!: string;
   public firstName!: string;
   public lastName!: string;
-  public createdAt!: Date;
+  public createdAt?: Date;
+  public updatedAt?: Date;
 }
 
 const UserModel = (sequelize: Sequelize) => {
   User.init(
     {
       id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
       },
       email: {
@@ -45,16 +46,11 @@ const UserModel = (sequelize: Sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      createdAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW,
-      },
     },
     {
       sequelize,
       tableName: 'users',
-      timestamps: false,
+      timestamps: true,
       indexes: [
         {
           unique: true,

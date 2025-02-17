@@ -7,4 +7,4 @@ import SearchResultModel from './search-result.model';
 export const User = UserModel(sequelize);
 export const Keyword = KeywordModel(sequelize);
 export const HtmlPageCache = HtmlPageCacheModel(sequelize);
-export const SearchResultM = SearchResultModel(sequelize);
+export const SearchResult = SearchResultModel(sequelize);

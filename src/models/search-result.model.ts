@@ -13,7 +13,8 @@ class SearchResult
   public totalAds!: number;
   public totalLinks!: number;
   public htmlCacheId?: number | null;
-  public createdAt!: Date;
+  public createdAt?: Date;
+  public updatedAt?: Date;
 }
 
 const SearchResultModel = (sequelize: Sequelize) => {
@@ -48,16 +49,11 @@ const SearchResultModel = (sequelize: Sequelize) => {
           key: 'id',
         },
       },
-      createdAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW,
-      },
     },
     {
       sequelize,
       tableName: 'search-results',
-      timestamps: false,
+      timestamps: true,
     },
   );
 

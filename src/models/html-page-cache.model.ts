@@ -10,7 +10,8 @@ class HtmlPageCache
 {
   public id!: number;
   public html!: string;
-  public createdAt!: Date;
+  public createdAt?: Date;
+  public updatedAt?: Date;
 }
 
 const HtmlPageCacheModel = (sequelize: Sequelize) => {
@@ -25,16 +26,11 @@ const HtmlPageCacheModel = (sequelize: Sequelize) => {
         type: DataTypes.TEXT('long'),
         allowNull: false,
       },
-      createdAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW,
-      },
     },
     {
       sequelize,
       tableName: 'html_page_caches',
-      timestamps: false,
+      timestamps: true,
     },
   );
 

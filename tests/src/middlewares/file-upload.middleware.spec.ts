@@ -15,11 +15,16 @@ import {
   validateFileTypeMiddleware,
 } from '@src/middlewares/file-upload.middleware';
 import { AppError } from '@src/utils/error.util';
+import * as keywordService from '@src/services/keyword.service';
+
+jest.mock('bullmq');
+jest.mock('ioredis');
+jest.mock('@src/services/keyword.service');
 
 describe('File upload middleware', () => {
   describe('fileUploadMiddleware', () => {
     let app: express.Application;
-    const user = { id: 1, username: 'testuser' };
+    const user = { id: 'mock-user-id', username: 'testuser' };
     const token = jwt.sign(user, process.env.JWT_SECRET);
 
     beforeAll(async () => {
@@ -70,6 +75,27 @@ describe('File upload middleware', () => {
     });
 
     it('should call next if file size is within the limit', async () => {
+      (keywordService.createBulk as jest.Mock).mockResolvedValue([
+        {
+          id: 1,
+          userId: 'mock-user-id',
+          keyword: 'keyword1',
+          status: 'pending',
+        },
+        {
+          id: 2,
+          userId: 'mock-user-id',
+          keyword: 'keyword2',
+          status: 'pending',
+        },
+        {
+          id: 3,
+          userId: 'mock-user-id',
+          keyword: 'keyword3',
+          status: 'pending',
+        },
+      ]);
+
       const csvContent = 'Keyword\nkeyword1\nkeyword2\nkeyword3';
       const filePath = path.join(__dirname, 'test.csv');
       fs.writeFileSync(filePath, csvContent);
