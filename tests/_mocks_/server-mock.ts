@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 export const requestMock = {
   headers: {},
   query: {},
+  params: {},
 } as unknown as Request;
 
 export const responseMock = {
