@@ -41,7 +41,7 @@ services:
       - redis-data:/data
 
   app:
-    image: app:local
+    image: ghcr.io/nimble-technical-challenge/backend/scrapping-api:prod
     depends_on:
       - postgres
       - redis
