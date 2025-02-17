@@ -42,7 +42,7 @@ export const processKeyword = async (
         KeywordStatus.Completed,
       );
 
-      await pollingService.emitKeywordUpdate(userId, keywordId);
+      pollingService.emitKeywordUpdate(userId, keywordId);
     }
 
     logger.info({ keyword }, 'Finished processing keyword');
@@ -61,7 +61,7 @@ export const keywordWorker = new Worker(QUEUE_NAME, processKeyword, {
   removeOnComplete: { count: 1000 },
   removeOnFail: { count: 500 },
   limiter: {
-    max: 100,
-    duration: 4000 * 100,
+    max: 10000,
+    duration: 6000 * 100,
   },
 });
