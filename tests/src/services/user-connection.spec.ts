@@ -2,6 +2,11 @@ import UserConnectionModel from '@src/models/user-connection.model';
 import sequelize from '@src/config/database';
 import * as userConnectionService from '@src/services/user-connection.service';
 import { expectException } from '@tests/helpers/expect-exception.helper';
+import {
+  mockSocketId,
+  mockUserConnection,
+  mockUserId,
+} from '@tests/_mocks_/context-mock';
 
 jest.mock('@src/models/user-connection.model', () => {
   const mockUserConnectionModel = {
@@ -13,12 +18,6 @@ jest.mock('@src/models/user-connection.model', () => {
 });
 
 describe('User connection service', () => {
-  const mockUserId = 'mock-user-id';
-  const mockSocketId = 'mock-socket-id';
-  const mockUserConnection = {
-    userId: mockUserId,
-    socketId: mockSocketId,
-  };
   const mockFindOne = UserConnectionModel(sequelize).findOne as jest.Mock;
   const mockCreate = UserConnectionModel(sequelize).create as jest.Mock;
   const mockDestroy = UserConnectionModel(sequelize).destroy as jest.Mock;

@@ -2,7 +2,12 @@ import * as userConnection from '@src/services/user-connection.service';
 import * as keywordService from '@src/services/keyword.service';
 import * as socketSetup from '@src/config/socket';
 import * as pollingService from '@src/services/polling.service';
-import { KeywordStatus } from '@src/enums/keyword.enum';
+import {
+  mockKeyword,
+  mockKeywordId,
+  mockSocketId,
+  mockUserId,
+} from '@tests/_mocks_/context-mock';
 
 jest.mock('@src/config/socket', () => ({
   getIO: jest.fn(),
@@ -15,16 +20,6 @@ jest.mock('@src/services/keyword.service', () => ({
 }));
 
 describe('Polling service', () => {
-  const mockSocketId = 'mock-socket-id';
-  const mockUserId = 'mock-user-id';
-  const mockKeywordId = 1;
-  const mockKeyword = {
-    id: mockKeywordId,
-    userId: mockUserId,
-    keyword: 'key1',
-    status: KeywordStatus.Pending,
-  };
-
   const mockIoEmit = {
     emit: jest.fn(),
   };

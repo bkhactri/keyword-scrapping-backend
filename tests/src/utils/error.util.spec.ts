@@ -1,3 +1,4 @@
+import { HttpStatus } from '@src/enums/http-status.enum';
 import {
   AppError,
   BadRequestError,
@@ -10,29 +11,36 @@ describe('Error util', () => {
   describe('AppError', () => {
     it('should create an AppError with correct data', () => {
       const message = 'Test error message';
-      const statusCode = 400;
       const isOperational = true;
       const details = { extra: 'info' };
 
-      const error = new AppError(message, statusCode, isOperational, details);
+      const error = new AppError(
+        message,
+        HttpStatus.BadRequest,
+        isOperational,
+        details,
+      );
 
       expect(error).toBeInstanceOf(AppError);
       expect(error.message).toBe(message);
-      expect(error.statusCode).toBe(statusCode);
+      expect(error.statusCode).toBe(HttpStatus.BadRequest);
       expect(error.isOperational).toBe(isOperational);
       expect(error.details).toEqual(details);
     });
 
     it('should create an AppError without details', () => {
       const message = 'Test error message without details';
-      const statusCode = 500;
       const isOperational = false;
 
-      const error = new AppError(message, statusCode, isOperational);
+      const error = new AppError(
+        message,
+        HttpStatus.InternalServerError,
+        isOperational,
+      );
 
       expect(error).toBeInstanceOf(AppError);
       expect(error.message).toBe(message);
-      expect(error.statusCode).toBe(statusCode);
+      expect(error.statusCode).toBe(HttpStatus.InternalServerError);
       expect(error.isOperational).toBe(isOperational);
       expect(error.details).toBeUndefined();
     });
@@ -46,7 +54,7 @@ describe('Error util', () => {
 
       expect(error).toBeInstanceOf(AppError);
       expect(error.message).toBe(message);
-      expect(error.statusCode).toBe(400);
+      expect(error.statusCode).toBe(HttpStatus.BadRequest);
       expect(error.isOperational).toBe(true);
       expect(error.details).toEqual(details);
     });
@@ -60,7 +68,7 @@ describe('Error util', () => {
 
       expect(error).toBeInstanceOf(AppError);
       expect(error.message).toBe(message);
-      expect(error.statusCode).toBe(401);
+      expect(error.statusCode).toBe(HttpStatus.Unauthorized);
       expect(error.isOperational).toBe(true);
       expect(error.details).toEqual(details);
     });
@@ -74,7 +82,7 @@ describe('Error util', () => {
 
       expect(error).toBeInstanceOf(AppError);
       expect(error.message).toBe(message);
-      expect(error.statusCode).toBe(404);
+      expect(error.statusCode).toBe(HttpStatus.NotFound);
       expect(error.isOperational).toBe(true);
       expect(error.details).toEqual(details);
     });
@@ -86,7 +94,7 @@ describe('Error util', () => {
 
       expect(error).toBeInstanceOf(AppError);
       expect(error.message).toBe('Internal Server Error');
-      expect(error.statusCode).toBe(500);
+      expect(error.statusCode).toBe(HttpStatus.InternalServerError);
       expect(error.isOperational).toBe(false);
       expect(error.details).toBeUndefined();
     });
@@ -98,7 +106,7 @@ describe('Error util', () => {
 
       expect(error).toBeInstanceOf(AppError);
       expect(error.message).toBe(message);
-      expect(error.statusCode).toBe(500);
+      expect(error.statusCode).toBe(HttpStatus.InternalServerError);
       expect(error.isOperational).toBe(false);
       expect(error.details).toEqual(details);
     });

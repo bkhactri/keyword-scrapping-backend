@@ -7,6 +7,7 @@ import * as fileController from '@src/controllers/file.controller';
 import { AppError } from '@src/utils/error.util';
 import * as fileService from '@src/services/file.service';
 import * as keywordService from '@src/services/keyword.service';
+import { mockKeywords } from '@tests/_mocks_/context-mock';
 
 jest.mock('bullmq');
 jest.mock('ioredis');
@@ -43,7 +44,7 @@ describe('File controller', () => {
         mimetype: 'application/json',
       } as Express.Multer.File;
 
-      mockParseCSV.mockResolvedValue(['key1', 'key2', 'key3']);
+      mockParseCSV.mockResolvedValue(mockKeywords);
       mockCreateBulk.mockResolvedValue([]);
 
       await fileController.uploadFile(requestMock, responseMock, nextFuncMock);

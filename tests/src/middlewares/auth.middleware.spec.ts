@@ -5,6 +5,7 @@ import {
   responseMock,
   nextFuncMock,
 } from '@tests/_mocks_/server-mock';
+import { mockAccessToken } from '@tests/_mocks_/context-mock';
 
 jest.mock('jsonwebtoken');
 
@@ -49,13 +50,13 @@ describe('Auth middleware', () => {
 
   it('should call next if token is valid', async () => {
     const mockDecodedToken = { userId: 1, email: 'test@example.com' };
-    requestMock.headers = { authorization: 'Bearer valid-token' };
+    requestMock.headers = { authorization: `Bearer ${mockAccessToken}` };
     (jwt.verify as jest.Mock).mockReturnValue(mockDecodedToken);
 
     await authMiddleware(requestMock, responseMock, nextFuncMock);
 
     expect(jwt.verify).toHaveBeenCalledWith(
-      'valid-token',
+      mockAccessToken,
       process.env.JWT_SECRET,
     );
     expect(nextFuncMock).toHaveBeenCalled();

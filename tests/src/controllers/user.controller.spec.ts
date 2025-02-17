@@ -6,6 +6,7 @@ import {
 import * as userController from '@src/controllers/user.controller';
 import * as userService from '@src/services/user.service';
 import { HttpStatus } from '@src/enums/http-status.enum';
+import { mockUser } from '@tests/_mocks_/context-mock';
 
 jest.mock('@src/services/user.service');
 
@@ -15,22 +16,15 @@ describe('User controller', () => {
   });
 
   describe('getUserInfo', () => {
-    const mockUser = {
-      id: 'mock-user-id',
-      email: 'mock-user-email',
-      firstName: 'mock-first-name',
-      lastName: 'mock-last-name',
-    };
-
     it('should throw error if user service cause error', async () => {
+      const mockError = new Error('User not found');
       requestMock.user = mockUser;
-      const error = new Error('User not found');
-      (userService.getUserInfo as jest.Mock).mockRejectedValue(error);
+      (userService.getUserInfo as jest.Mock).mockRejectedValue(mockError);
 
       await userController.getUserInfo(requestMock, responseMock, nextFuncMock);
 
       expect(nextFuncMock).toHaveBeenCalled();
-      expect(nextFuncMock).toHaveBeenCalledWith(error);
+      expect(nextFuncMock).toHaveBeenCalledWith(mockError);
     });
 
     it('should return user info and return 200 if successful', async () => {
@@ -39,7 +33,7 @@ describe('User controller', () => {
 
       await userController.getUserInfo(requestMock, responseMock, nextFuncMock);
 
-      expect(userService.getUserInfo).toHaveBeenCalledWith('mock-user-id');
+      expect(userService.getUserInfo).toHaveBeenCalledWith(mockUser.id);
       expect(responseMock.status).toHaveBeenCalledWith(HttpStatus.Ok);
       expect(responseMock.json).toHaveBeenCalledWith(mockUser);
     });

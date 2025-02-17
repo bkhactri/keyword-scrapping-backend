@@ -3,6 +3,13 @@ import sequelize from '@src/config/database';
 import * as keywordService from '@src/services/keyword.service';
 import { expectException } from '@tests/helpers/expect-exception.helper';
 import { KeywordStatus } from '@src/enums/keyword.enum';
+import {
+  mockKeyword,
+  mockKeywordId,
+  mockKeywords,
+  mockPagination,
+  mockUserId,
+} from '@tests/_mocks_/context-mock';
 
 jest.mock('@src/models/keyword.model', () => {
   const mockKeywordModel = {
@@ -15,29 +22,15 @@ jest.mock('@src/models/keyword.model', () => {
 });
 
 describe('Keyword service', () => {
+  const mockFilter = {
+    search: 'mock-search',
+  };
+
   const mockBulkCreate = KeywordModel(sequelize).bulkCreate as jest.Mock;
   const mockUpdate = KeywordModel(sequelize).update as jest.Mock;
   const mockFindByPk = KeywordModel(sequelize).findByPk as jest.Mock;
   const mockFindAndCountAll = KeywordModel(sequelize)
     .findAndCountAll as jest.Mock;
-  const mockUserId = 'mock-user-id';
-  const mockKeywordId = 1;
-  const mockKeywords = ['key1', 'key2', 'key3'];
-  const mockKeyword = {
-    id: mockKeywordId,
-    userId: mockUserId,
-    keyword: 'key1',
-    status: KeywordStatus.Pending,
-    createdAt: 'mock-created-at',
-    updatedAt: 'mock-updated-at',
-  };
-  const mockPagination = {
-    page: 0,
-    pageSize: 20,
-  };
-  const mockFilter = {
-    search: 'mock-search',
-  };
 
   describe('createBulk', () => {
     it('should bulk create keywords and return data mapped to dto', async () => {
@@ -45,24 +38,24 @@ describe('Keyword service', () => {
         {
           dataValues: {
             id: 1,
-            userId: 'mock-user-id',
-            status: 'pending',
+            userId: mockUserId,
+            status: KeywordStatus.Pending,
             keyword: 'key1',
           },
         },
         {
           dataValues: {
             id: 2,
-            userId: 'mock-user-id',
-            status: 'pending',
+            userId: mockUserId,
+            status: KeywordStatus.Pending,
             keyword: 'key2',
           },
         },
         {
           dataValues: {
             id: 3,
-            userId: 'mock-user-id',
-            status: 'pending',
+            userId: mockUserId,
+            status: KeywordStatus.Pending,
             keyword: 'key3',
           },
         },
@@ -73,26 +66,26 @@ describe('Keyword service', () => {
       expect(mockBulkCreate).toHaveBeenCalled();
       expect(mockBulkCreate).toHaveBeenCalledWith([
         {
-          userId: 'mock-user-id',
-          status: 'pending',
+          userId: mockUserId,
+          status: KeywordStatus.Pending,
           keyword: 'key1',
         },
         {
-          userId: 'mock-user-id',
-          status: 'pending',
+          userId: mockUserId,
+          status: KeywordStatus.Pending,
           keyword: 'key2',
         },
         {
-          userId: 'mock-user-id',
-          status: 'pending',
+          userId: mockUserId,
+          status: KeywordStatus.Pending,
           keyword: 'key3',
         },
       ]);
       expect(result.length).toBe(3);
       expect(result[0]).toMatchObject({
         id: 1,
-        userId: 'mock-user-id',
-        status: 'pending',
+        userId: mockUserId,
+        status: KeywordStatus.Pending,
         keyword: 'key1',
       });
     });
@@ -176,8 +169,7 @@ describe('Keyword service', () => {
       expect(result).toMatchObject({
         total: 1,
         keywords: [mockKeyword],
-        page: 0,
-        pageSize: 20,
+        ...mockPagination,
       });
     });
 
