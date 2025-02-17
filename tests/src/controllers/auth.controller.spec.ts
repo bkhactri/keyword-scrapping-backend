@@ -106,7 +106,7 @@ describe('Auth controller', () => {
 
       expect(authService.login).toHaveBeenCalledWith(validatedData);
       expect(responseMock.status).toHaveBeenCalledWith(HttpStatus.Ok);
-      expect(responseMock.json).toHaveBeenCalledWith({ token });
+      expect(responseMock.json).toHaveBeenCalledWith('test-token');
       expect(nextFuncMock).not.toHaveBeenCalled();
     });
 

@@ -12,6 +12,8 @@ router.post(
     check('password')
       .isLength({ min: 6 })
       .withMessage('must be at least 5 chars long'),
+    check('firstName').isLength({ min: 1 }).withMessage('provide first name'),
+    check('lastName').isLength({ min: 1 }).withMessage('provide last name'),
   ],
   authController.signup,
 );

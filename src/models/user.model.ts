@@ -1,11 +1,11 @@
 import { DataTypes, Model, Sequelize } from 'sequelize';
 import {
   UserAttributes,
-  UserCreationAttributes,
+  UserCreationPayload,
 } from '../interfaces/user.interface';
 
 class User
-  extends Model<UserAttributes, UserCreationAttributes>
+  extends Model<UserAttributes, UserCreationPayload>
   implements UserAttributes
 {
   public id!: number;

@@ -2,8 +2,8 @@ import { NextFunction, Request, Response } from 'express';
 import { validationResult, matchedData } from 'express-validator';
 import * as authService from '../services/auth.service';
 import {
-  UserSignUpAttributes,
-  UserSignInAttributes,
+  UserSignUpPayload,
+  UserSignInPayload,
 } from '../interfaces/user.interface';
 import { HttpStatus } from '../enums/http-status.enum';
 
@@ -18,10 +18,10 @@ export const signup = async (
   }
 
   try {
-    const validatedData = matchedData(req) as UserSignUpAttributes;
-    const newUser = await authService.signup(validatedData);
+    const validatedData = matchedData(req) as UserSignUpPayload;
+    const newUserInfo = await authService.signup(validatedData);
 
-    return res.status(HttpStatus.Created).json(newUser);
+    return res.status(HttpStatus.Created).json(newUserInfo);
   } catch (error) {
     return next(error);
   }
@@ -38,10 +38,10 @@ export const login = async (
   }
 
   try {
-    const validatedData = matchedData(req) as UserSignInAttributes;
-    const token = await authService.login(validatedData);
+    const validatedData = matchedData(req) as UserSignInPayload;
+    const authenticatedInfo = await authService.login(validatedData);
 
-    return res.status(HttpStatus.Ok).json({ token });
+    return res.status(HttpStatus.Ok).json(authenticatedInfo);
   } catch (error) {
     return next(error);
   }

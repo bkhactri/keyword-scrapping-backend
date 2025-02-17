@@ -2,8 +2,8 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import {
   UserAttributes,
-  UserSignUpAttributes,
-  UserSignInAttributes,
+  UserSignUpPayload,
+  UserSignInPayload,
 } from '@src/interfaces/user.interface';
 import { AppError } from '@src/utils/error.util';
 import UserModel from '@src/models/user.model';
@@ -42,14 +42,14 @@ describe('Auth service', () => {
     createdAt: new Date('2024-12-13 07:55:17.615+00'),
   };
 
-  const userSignUpPayload: UserSignUpAttributes = {
+  const userSignUpPayload: UserSignUpPayload = {
     email: 'test@example.com',
     password: 'password',
     firstName: 'mock first name',
     lastName: 'mock last name',
   };
 
-  const userSignInPayload: UserSignInAttributes = {
+  const userSignInPayload: UserSignInPayload = {
     email: 'test@example.com',
     password: 'password',
   };
@@ -62,7 +62,11 @@ describe('Auth service', () => {
     it('should create a new user and return the user object', async () => {
       mockFindOne.mockResolvedValue(null);
       mockHash.mockResolvedValue('hashedPassword');
-      mockCreate.mockResolvedValue(mockUser);
+      mockCreate.mockResolvedValue({
+        dataValues: {
+          ...mockUser,
+        },
+      });
 
       const newUser = await authService.signup(userSignUpPayload);
 
@@ -74,7 +78,12 @@ describe('Auth service', () => {
         ...userSignUpPayload,
         passwordHash: 'hashedPassword',
       });
-      expect(newUser).toEqual(mockUser);
+      expect(newUser).toMatchObject({
+        id: 1,
+        email: 'test@example.com',
+        firstName: 'mock first name',
+        lastName: 'mock last name',
+      });
     });
 
     it('should throw BadRequestError if email already exists', async () => {
@@ -112,7 +121,13 @@ describe('Auth service', () => {
         userSignInPayload.password,
         mockUser.passwordHash,
       );
-      expect(token).toBe('mock-token');
+      expect(token).toMatchObject({
+        accessToken: 'mock-token',
+        email: 'test@example.com',
+        firstName: 'mock first name',
+        id: 1,
+        lastName: 'mock last name',
+      });
     });
 
     it('should throw UnauthorizedError if credentials are invalid', async () => {

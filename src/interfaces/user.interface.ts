@@ -5,21 +5,22 @@ export interface UserAttributes {
   lastName: string;
   passwordHash: string;
   createdAt: Date;
+  accessToken?: string;
 }
 
-export interface UserSignUpAttributes {
+export interface UserSignUpPayload {
   email: string;
   password: string;
   firstName: string;
   lastName: string;
 }
 
-export interface UserSignInAttributes {
+export interface UserSignInPayload {
   email: string;
   password: string;
 }
 
-export interface UserCreationAttributes
-  extends Omit<UserSignUpAttributes, 'password'> {
+export interface UserCreationPayload
+  extends Omit<UserSignUpPayload, 'password'> {
   passwordHash: string;
 }
