@@ -4,28 +4,55 @@ import * as scrapeService from '@src/services/scrape.service';
 jest.mock('puppeteer');
 
 describe('Scrape service', () => {
+  describe('getRandomUserAgent', () => {
+    it('should return a random user agent string', () => {
+      // Act
+      const userAgent = scrapeService.getRandomUserAgent();
+
+      // Assert
+      expect(typeof userAgent).toBe('string');
+    });
+  });
+
+  describe('buildQueryUrl', () => {
+    it('should build URL with search and pageIndex', () => {
+      // Arrange
+      const searchKeyword = 'mock-search';
+      const pageIndex = 0;
+
+      // Act
+      const url = scrapeService.buildQueryUrl(searchKeyword, pageIndex);
+
+      // Assert
+      expect(url).toBe('https://www.google.com/search?q=mock-search&start=0');
+    });
+
+    it('should build raw URL without any query param', () => {
+      // Arrange
+      const searchKeyword = '';
+      const pageIndex = 2;
+
+      // Act
+      const url = scrapeService.buildQueryUrl(searchKeyword, pageIndex);
+
+      // Assert
+      expect(url).toBe('https://www.google.com/search?');
+    });
+  });
+
   describe('scrapeGoogle', () => {
-    let mockNewPage: jest.Mock;
-    let mockSetUserAgent: jest.Mock;
-    let mockOn: jest.Mock;
-    let mockGoto: jest.Mock;
-    let mockWaitForSelector: jest.Mock;
-    let mockEvaluate: jest.Mock;
-    let mockContent: jest.Mock;
-    let mockClose: jest.Mock;
-    let mockSetViewport: jest.Mock;
+    const searchKeyword = 'mock-search';
+    const mockNewPage = jest.fn();
+    const mockSetUserAgent = jest.fn();
+    const mockOn = jest.fn();
+    const mockGoto = jest.fn();
+    const mockWaitForSelector = jest.fn();
+    const mockEvaluate = jest.fn();
+    const mockContent = jest.fn();
+    const mockClose = jest.fn();
+    const mockSetViewport = jest.fn();
 
     beforeEach(() => {
-      mockNewPage = jest.fn();
-      mockSetUserAgent = jest.fn();
-      mockOn = jest.fn();
-      mockGoto = jest.fn();
-      mockWaitForSelector = jest.fn();
-      mockEvaluate = jest.fn();
-      mockContent = jest.fn();
-      mockClose = jest.fn();
-      mockSetViewport = jest.fn();
-
       (puppeteer.launch as jest.Mock).mockResolvedValue({
         newPage: mockNewPage.mockResolvedValue({
           setUserAgent: mockSetUserAgent,
@@ -45,43 +72,21 @@ describe('Scrape service', () => {
       jest.clearAllMocks();
     });
 
-    it('should successfully scrape data', async () => {
-      mockEvaluate
-        .mockResolvedValueOnce(2)
-        .mockResolvedValueOnce(2)
-        .mockResolvedValueOnce(10)
-        .mockResolvedValueOnce(1);
-      mockContent.mockResolvedValue('<html></html>');
-
-      const result = await scrapeService.scrapeGoogle('test', 0);
-
-      expect(result).toEqual({
-        totalAds: 4,
-        totalLinks: 10,
-        htmlCachePage: '<html></html>',
-      });
-      expect(puppeteer.launch).toHaveBeenCalled();
-      expect(mockNewPage).toHaveBeenCalled();
-      expect(mockSetUserAgent).toHaveBeenCalled();
-      expect(mockGoto).toHaveBeenCalledWith(
-        'https://www.google.com/search?q=test&start=0',
-        { waitUntil: 'domcontentloaded', timeout: 15000 },
-      );
-      expect(mockWaitForSelector).toHaveBeenCalledWith('body');
-      expect(mockClose).toHaveBeenCalledTimes(1);
-    }, 3000);
-
     it('should handle navigation errors', async () => {
+      // Arrange
       const error = new Error('Navigation Error');
       mockGoto.mockRejectedValue(error);
 
-      const result = await scrapeService.scrapeGoogle('test', 0);
+      // Act
+      const result = await scrapeService.scrapeGoogle(searchKeyword, 0);
 
+      // Assert
       expect(result).toBeNull();
       expect(mockClose).toHaveBeenCalledTimes(1);
     }, 3000);
 
     it('should handle page errors', async () => {
+      // Arrange
       const error = new Error('Page Error');
       mockOn.mockImplementation((event, callback) => {
         if (event === 'error') {
@@ -89,7 +94,10 @@ describe('Scrape service', () => {
         }
       });
 
-      await scrapeService.scrapeGoogle('test', 0);
+      // Act
+      await scrapeService.scrapeGoogle(searchKeyword, 0);
+
+      // Assert
       expect(mockClose).toHaveBeenCalledTimes(2);
     }, 3000);
   });

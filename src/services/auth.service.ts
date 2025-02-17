@@ -18,7 +18,7 @@ const generateToken = (user: UserAttributes): string => {
       lastName: user.lastName,
     },
     process.env.JWT_SECRET as string,
-    { expiresIn: process.env.JWT_EXPIRED_TIME || '1h' },
+    { expiresIn: process.env.JWT_EXPIRED_TIME },
   );
 };
 

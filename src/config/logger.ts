@@ -1,10 +1,10 @@
-import bunyan from 'bunyan';
+import bunyan, { LogLevel } from 'bunyan';
 
 const logger = bunyan.createLogger({
   name: 'scrapping-backend',
   streams: [
     {
-      level: process.env.NODE_ENV === 'local' ? 'debug' : 'info',
+      level: process.env.LOG_LEVEL as LogLevel,
       stream: process.stdout,
     },
   ],

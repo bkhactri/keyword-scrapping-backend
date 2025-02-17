@@ -3,7 +3,11 @@ import sequelize from '@src/config/database';
 import { expectException } from '@tests/helpers/expect-exception.helper';
 import * as userService from '@src/services/user.service';
 import { AppError } from '@src/utils/error.util';
-import { mockUserId } from '@tests/_mocks_/context-mock';
+import {
+  mockUserId,
+  mockUserAttributes,
+  mockUserDto,
+} from '@tests/_mocks_/user-mock';
 
 jest.mock('@src/models/user.model', () => {
   const mockUserModel = {
@@ -21,8 +25,10 @@ describe('User service', () => {
 
   describe('getUserInfo', () => {
     it('should throw error if user not found', async () => {
+      // Arrange
       mockFindByPk.mockResolvedValue(null);
 
+      // Act + Assert
       await expectException({
         fn: () => userService.getUserInfo(mockUserId),
         exceptionInstance: AppError,
@@ -31,17 +37,18 @@ describe('User service', () => {
     });
 
     it('should return correct user data', async () => {
+      // Arrange
       mockFindByPk.mockResolvedValue({
-        dataValues: {
-          id: mockUserId,
-        },
+        dataValues: mockUserAttributes,
       });
 
+      // Act
       const result = await userService.getUserInfo(mockUserId);
 
+      // Assert
       expect(mockFindByPk).toHaveBeenCalled();
       expect(mockFindByPk).toHaveBeenCalledWith(mockUserId);
-      expect(result).toMatchObject({ id: mockUserId });
+      expect(result).toMatchObject(mockUserDto);
     });
   });
 });

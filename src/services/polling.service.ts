@@ -18,7 +18,7 @@ export const emitKeywordUpdate = async (userId: string, keywordId: number) => {
     const keyword = await keywordService.getByKeywordId(keywordId);
 
     if (!keyword) {
-      logger.error({ keywordId }, 'Keyword with ID not found');
+      logger.warn({ keywordId }, 'Keyword with ID not found');
       return;
     }
 
@@ -27,7 +27,7 @@ export const emitKeywordUpdate = async (userId: string, keywordId: number) => {
     );
 
     if (!searchResult) {
-      logger.error({ keyword }, 'Search result not found');
+      logger.warn({ keywordId }, 'Search result not found');
       return;
     }
 

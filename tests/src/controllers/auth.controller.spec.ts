@@ -1,6 +1,6 @@
 import {
-  requestMock,
-  responseMock,
+  getRequestMock,
+  getResponseMock,
   nextFuncMock,
 } from '@tests/_mocks_/server-mock';
 import { matchedData } from 'express-validator';
@@ -8,16 +8,21 @@ import * as authService from '@src/services/auth.service';
 import { HttpStatus } from '@src/enums/http-status.enum';
 import * as authController from '@src/controllers/auth.controller';
 import { BadRequestError } from '@src/utils/error.util';
-import { mockAccessToken } from '@tests/_mocks_/context-mock';
+import {
+  mockUserSignInPayload,
+  mockUserSignUpPayload,
+} from '@tests/_mocks_/user-mock';
+import {
+  mockUserDto,
+  mockUserDtoWithAccessToken,
+} from '@tests/_mocks_/user-mock';
 
 jest.mock('express-validator');
 jest.mock('@src/services/auth.service');
 
 describe('Auth controller', () => {
-  const mockValidatedData = {
-    email: 'test@example.com',
-    passwordHash: 'password',
-  };
+  const requestMock = getRequestMock();
+  const responseMock = getResponseMock();
 
   afterEach(() => {
     jest.clearAllMocks();
@@ -25,31 +30,29 @@ describe('Auth controller', () => {
 
   describe('signup', () => {
     it('should create a new user and return 201 if successful', async () => {
-      (matchedData as jest.Mock).mockReturnValue(mockValidatedData);
-      (authService.signup as jest.Mock).mockResolvedValue({
-        id: 1,
-        ...mockValidatedData,
-        createdAt: new Date(),
-      });
+      // Arrange
+      (matchedData as jest.Mock).mockReturnValue(mockUserSignUpPayload);
+      (authService.signup as jest.Mock).mockResolvedValue(mockUserDto);
 
+      // Act
       await authController.signup(requestMock, responseMock, nextFuncMock);
 
-      expect(authService.signup).toHaveBeenCalledWith(mockValidatedData);
+      // Assert
+      expect(authService.signup).toHaveBeenCalledWith(mockUserSignUpPayload);
       expect(responseMock.status).toHaveBeenCalledWith(HttpStatus.Created);
-      expect(responseMock.json).toHaveBeenCalledWith({
-        id: 1,
-        ...mockValidatedData,
-        createdAt: expect.any(Date),
-      });
+      expect(responseMock.json).toHaveBeenCalledWith(mockUserDto);
     });
 
-    it('should call next with error if throw an error', async () => {
+    it('should call next with error if auth service signup throw an error', async () => {
+      // Arrange
       const error = new Error('Signup failed');
       (matchedData as jest.Mock).mockReturnValue({});
       (authService.signup as jest.Mock).mockRejectedValue(error);
 
+      // Act
       await authController.signup(requestMock, responseMock, nextFuncMock);
 
+      // Assert
       expect(authService.signup).toHaveBeenCalled();
       expect(nextFuncMock).toHaveBeenCalledWith(error);
       expect(responseMock.status).not.toHaveBeenCalled();
@@ -59,24 +62,34 @@ describe('Auth controller', () => {
 
   describe('login', () => {
     it('should return a token and 200 if successful', async () => {
-      (matchedData as jest.Mock).mockReturnValue(mockValidatedData);
-      (authService.login as jest.Mock).mockResolvedValue(mockAccessToken);
+      // Arrange
+      (matchedData as jest.Mock).mockReturnValue(mockUserSignInPayload);
+      (authService.login as jest.Mock).mockResolvedValue(
+        mockUserDtoWithAccessToken,
+      );
 
+      // Act
       await authController.login(requestMock, responseMock, nextFuncMock);
 
-      expect(authService.login).toHaveBeenCalledWith(mockValidatedData);
+      // Assert
+      expect(authService.login).toHaveBeenCalledWith(mockUserSignInPayload);
       expect(responseMock.status).toHaveBeenCalledWith(HttpStatus.Ok);
-      expect(responseMock.json).toHaveBeenCalledWith(mockAccessToken);
+      expect(responseMock.json).toHaveBeenCalledWith(
+        mockUserDtoWithAccessToken,
+      );
       expect(nextFuncMock).not.toHaveBeenCalled();
     });
 
-    it('should call next with error if throw an error', async () => {
+    it('should call next with error if auth service login throw an error', async () => {
+      // Arrange
       const error = new BadRequestError('Error');
       (matchedData as jest.Mock).mockReturnValue({});
       (authService.login as jest.Mock).mockRejectedValue(error);
 
+      // Act
       await authController.login(requestMock, responseMock, nextFuncMock);
 
+      // Assert
       expect(authService.login).toHaveBeenCalled();
       expect(nextFuncMock).toHaveBeenCalledWith(error);
       expect(responseMock.status).not.toHaveBeenCalled();

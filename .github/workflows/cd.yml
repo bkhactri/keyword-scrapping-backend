@@ -31,6 +31,6 @@ jobs:
         run: |
           docker push ghcr.io/${{ github.repository }}/scrapping-api:prod
 
-      - name: Push to Portainer
-        run: |
-          curl -fksv -X POST ${{ secrets.SCRAPPING_BE_HOOK }}
+      # - name: Push to Portainer
+      #   run: |
+      #     curl -fksv -X POST ${{ secrets.SCRAPPING_BE_HOOK }}

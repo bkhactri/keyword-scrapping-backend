@@ -1,21 +1,25 @@
 import jwt from 'jsonwebtoken';
 import authMiddleware from '@src/middlewares/auth.middleware';
 import {
-  requestMock,
-  responseMock,
+  getRequestMock,
+  getResponseMock,
   nextFuncMock,
 } from '@tests/_mocks_/server-mock';
-import { mockAccessToken } from '@tests/_mocks_/context-mock';
-
-jest.mock('jsonwebtoken');
+import { mockUserTokenPayload } from '@tests/_mocks_/user-mock';
 
 describe('Auth middleware', () => {
+  const requestMock = getRequestMock();
+  const responseMock = getResponseMock();
+
   afterEach(() => {
     jest.clearAllMocks();
   });
 
   it('should call next with UnauthorizedError if no authorization header is provided', async () => {
+    // Act
     await authMiddleware(requestMock, responseMock, nextFuncMock);
+
+    // Assert
     expect(nextFuncMock).toHaveBeenCalledWith(expect.any(Error));
     expect(nextFuncMock).toHaveBeenCalledWith(
       expect.objectContaining({ message: 'No token provided' }),
@@ -23,13 +27,13 @@ describe('Auth middleware', () => {
   });
 
   it('should call next with UnauthorizedError if token is invalid (jwt.verify throws error)', async () => {
+    // Arrange
     requestMock.headers = { authorization: 'Bearer invalid-token' };
-    (jwt.verify as jest.Mock).mockImplementation(() => {
-      throw new Error('jwt malformed');
-    });
 
+    // Act
     await authMiddleware(requestMock, responseMock, nextFuncMock);
 
+    // Assert
     expect(nextFuncMock).toHaveBeenCalledWith(expect.any(Error));
     expect(nextFuncMock).toHaveBeenCalledWith(
       expect.objectContaining({ message: 'Invalid token' }),
@@ -37,11 +41,13 @@ describe('Auth middleware', () => {
   });
 
   it('should call next with UnauthorizedError if token is invalid (jwt.verify return null)', async () => {
+    // Arrange
     requestMock.headers = { authorization: 'Bearer invalid-token' };
-    (jwt.verify as jest.Mock).mockReturnValue(null);
 
+    // Act
     await authMiddleware(requestMock, responseMock, nextFuncMock);
 
+    // Assert
     expect(nextFuncMock).toHaveBeenCalledWith(expect.any(Error));
     expect(nextFuncMock).toHaveBeenCalledWith(
       expect.objectContaining({ message: 'Invalid token' }),
@@ -49,16 +55,19 @@ describe('Auth middleware', () => {
   });
 
   it('should call next if token is valid', async () => {
-    const mockDecodedToken = { userId: 1, email: 'test@example.com' };
+    // Arrange
+    const mockAccessToken = jwt.sign(
+      mockUserTokenPayload,
+      process.env.JWT_SECRET as string,
+      { expiresIn: process.env.JWT_EXPIRED_TIME },
+    );
     requestMock.headers = { authorization: `Bearer ${mockAccessToken}` };
-    (jwt.verify as jest.Mock).mockReturnValue(mockDecodedToken);
 
+    // Act
     await authMiddleware(requestMock, responseMock, nextFuncMock);
 
-    expect(jwt.verify).toHaveBeenCalledWith(
-      mockAccessToken,
-      process.env.JWT_SECRET,
-    );
+    // Assert
+    expect(requestMock.user).toMatchObject(mockUserTokenPayload);
     expect(nextFuncMock).toHaveBeenCalled();
   });
 });

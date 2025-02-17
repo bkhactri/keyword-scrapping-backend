@@ -5,7 +5,7 @@ export const QUEUE_NAME = 'keyword-processing';
 
 export const redisConnection = new Redis({
   host: process.env.REDIS_HOST,
-  port: Number(process.env.REDIS_PORT || 6379),
+  port: Number(process.env.REDIS_PORT),
   maxRetriesPerRequest: null,
 });
 

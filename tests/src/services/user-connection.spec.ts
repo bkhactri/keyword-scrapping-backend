@@ -2,46 +2,48 @@ import UserConnectionModel from '@src/models/user-connection.model';
 import sequelize from '@src/config/database';
 import * as userConnectionService from '@src/services/user-connection.service';
 import { expectException } from '@tests/helpers/expect-exception.helper';
+import { mockSocketId } from '@tests/_mocks_/context-mock';
 import {
-  mockSocketId,
-  mockUserConnection,
   mockUserId,
-} from '@tests/_mocks_/context-mock';
+  mockUserConnectionCreatePayload,
+  mockUserConnectionAttributes,
+} from '@tests/_mocks_/user-mock';
 
 jest.mock('@src/models/user-connection.model', () => {
-  const mockUserConnectionModel = {
+  const mockUserConnectionCreatePayloadModel = {
     findOne: jest.fn(),
     create: jest.fn(),
     destroy: jest.fn(),
   };
-  return jest.fn(() => mockUserConnectionModel);
+  return jest.fn(() => mockUserConnectionCreatePayloadModel);
 });
 
 describe('User connection service', () => {
-  const mockFindOne = UserConnectionModel(sequelize).findOne as jest.Mock;
-  const mockCreate = UserConnectionModel(sequelize).create as jest.Mock;
-  const mockDestroy = UserConnectionModel(sequelize).destroy as jest.Mock;
-
   describe('getByUserId', () => {
+    const mockFindOne = UserConnectionModel(sequelize).findOne as jest.Mock;
+
     it('should return correct user connection data', async () => {
+      // Arrange
       mockFindOne.mockResolvedValue({
-        dataValues: {
-          id: mockUserId,
-        },
+        dataValues: mockUserConnectionAttributes,
       });
 
+      // Act
       const result = await userConnectionService.getByUserId(mockUserId);
 
+      // Assert
       expect(mockFindOne).toHaveBeenCalled();
       expect(mockFindOne).toHaveBeenCalledWith({
         where: { userId: mockUserId },
       });
-      expect(result).toMatchObject({ id: mockUserId });
+      expect(result).toMatchObject(mockUserConnectionAttributes);
     });
 
     it('should throw error if get return empty result', async () => {
+      // Arrange
       mockFindOne.mockResolvedValue(null);
 
+      // Act + Assert
       await expectException({
         fn: () => userConnectionService.getByUserId(mockUserId),
         exceptionInstance: Error,
@@ -51,30 +53,35 @@ describe('User connection service', () => {
   });
 
   describe('createConnection', () => {
+    const mockCreate = UserConnectionModel(sequelize).create as jest.Mock;
+
     it('should create correct user connection with payload', async () => {
+      // Arrange
       mockCreate.mockResolvedValue({
-        dataValues: {
-          id: 1,
-          ...mockUserConnection,
-        },
+        dataValues: mockUserConnectionAttributes,
       });
 
-      const result =
-        await userConnectionService.createConnection(mockUserConnection);
+      // Act
+      const result = await userConnectionService.createConnection(
+        mockUserConnectionCreatePayload,
+      );
 
+      // Assert
       expect(mockCreate).toHaveBeenCalled();
-      expect(mockCreate).toHaveBeenCalledWith(mockUserConnection);
-      expect(result).toMatchObject({
-        id: 1,
-        ...mockUserConnection,
-      });
+      expect(mockCreate).toHaveBeenCalledWith(mockUserConnectionCreatePayload);
+      expect(result).toMatchObject(mockUserConnectionAttributes);
     });
 
     it('should throw error if creation return empty result', async () => {
+      // Arrange
       mockCreate.mockResolvedValue(null);
 
+      // Act + Assert
       await expectException({
-        fn: () => userConnectionService.createConnection(mockUserConnection),
+        fn: () =>
+          userConnectionService.createConnection(
+            mockUserConnectionCreatePayload,
+          ),
         exceptionInstance: Error,
         message: 'Create user connection failed',
       });
@@ -82,12 +89,17 @@ describe('User connection service', () => {
   });
 
   describe('deleteConnectionBySocketId', () => {
+    const mockDestroy = UserConnectionModel(sequelize).destroy as jest.Mock;
+
     it('should delete user connection', async () => {
+      // Arrange
       mockDestroy.mockResolvedValue(1);
 
+      // Act
       const result =
         await userConnectionService.deleteConnectionBySocketId(mockSocketId);
 
+      // Assert
       expect(mockDestroy).toHaveBeenCalled();
       expect(mockDestroy).toHaveBeenCalledWith({
         where: { socketId: mockSocketId },
@@ -96,8 +108,10 @@ describe('User connection service', () => {
     });
 
     it('should throw error if deletion return empty result', async () => {
+      // Arrange
       mockDestroy.mockResolvedValue(null);
 
+      // Act + Assert
       await expectException({
         fn: () =>
           userConnectionService.deleteConnectionBySocketId(mockSocketId),
@@ -108,12 +122,17 @@ describe('User connection service', () => {
   });
 
   describe('deleteConnectionByUserId', () => {
+    const mockDestroy = UserConnectionModel(sequelize).destroy as jest.Mock;
+
     it('should delete user connection', async () => {
+      // Arrange
       mockDestroy.mockResolvedValue(1);
 
+      // Act
       const result =
         await userConnectionService.deleteConnectionByUserId(mockUserId);
 
+      // Assert
       expect(mockDestroy).toHaveBeenCalled();
       expect(mockDestroy).toHaveBeenCalledWith({
         where: { userId: mockUserId },
