@@ -41,7 +41,7 @@ services:
       - redis-data:/data
 
   app:
-    image: ghcr.io/nimble-technical-challenge/backend/scrapping-api:prod
+    image: ghcr.io/keyword-scrapping-backend/scrapping-api:prod
     depends_on:
       - postgres
       - redis
